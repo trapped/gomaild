@@ -4,6 +4,30 @@
 		"selected_items":
 		[
 			[
+				"k",
+				"Keep"
+			],
+			[
+				"po",
+				"Port"
+			],
+			[
+				"Raw",
+				"RawArguments	[]string ν"
+			],
+			[
+				"ra",
+				"RawArguments	[]string ν"
+			],
+			[
+				"trim",
+				"TrimSpace	string ƒ"
+			],
+			[
+				"func",
+				"func (*Parser)	func (...) {...} ʂ"
+			],
+			[
 				"Print",
 				"Println	 ƒ"
 			],
@@ -14,10 +38,6 @@
 			[
 				"Ti",
 				"Time	struct ʈ"
-			],
-			[
-				"func",
-				"func (*Client)	func (...) {...} ʂ"
 			],
 			[
 				"li",
@@ -56,10 +76,10 @@
 	"buffers":
 	[
 		{
-			"file": "pop3d.go",
+			"file": "gomaild.go",
 			"settings":
 			{
-				"buffer_size": 138,
+				"buffer_size": 170,
 				"line_ending": "Unix"
 			}
 		},
@@ -67,17 +87,32 @@
 			"file": "processors/pop3/pop3.go",
 			"settings":
 			{
-				"buffer_size": 440,
+				"buffer_size": 686,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "structs/structs.go",
+			"file": "processors/pop3/cmdprocessor/cmdprocessor.go",
 			"settings":
 			{
-				"buffer_size": 718,
-				"line_ending": "Unix",
-				"name": "package structs"
+				"buffer_size": 390,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "parsers/textual/textual.go",
+			"settings":
+			{
+				"buffer_size": 833,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "processors/pop3/client/client.go",
+			"settings":
+			{
+				"buffer_size": 860,
+				"line_ending": "Unix"
 			}
 		}
 	],
@@ -133,6 +168,14 @@
 	},
 	"file_history":
 	[
+		"/home/giorgio/go/src/github.com/trapped/gomaild/processors/pop3/cmdprocessor/cmdprocessor.go",
+		"/home/giorgio/go/src/github.com/trapped/gomaild/.gitignore",
+		"/home/giorgio/go/src/github.com/trapped/gomaild/processors/pop3/cmdparser/cmdparser.go",
+		"/home/giorgio/go/src/github.com/trapped/gomaild/processors/pop3/cmdobject/cmdobject.go",
+		"/home/giorgio/go/src/github.com/trapped/gomaild/README.md",
+		"/home/giorgio/go/src/github.com/trapped/gomaild/LICENSE",
+		"/home/giorgio/go/src/github.com/trapped/gomaild/pop3d.go",
+		"/home/giorgio/go/src/github.com/trapped/gomaild/structs/structs.go",
 		"/home/giorgio/go/src/trapped/gomaild/processors/pop3.go",
 		"/home/giorgio/go_work/src/trapped/gomail/gomail.go",
 		"/home/giorgio/.config/sublime-text-3/Packages/GoSublime/GoSublime.sublime-settings",
@@ -164,6 +207,10 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"KEEP",
+			"Port",
+			"PORT",
+			"	 ",
 			"pop3",
 			"pop3d"
 		],
@@ -188,19 +235,152 @@
 			[
 				{
 					"buffer": 0,
-					"file": "pop3d.go",
+					"file": "gomaild.go",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 138,
+						"buffer_size": 170,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								43,
-								43
+								149,
+								149
+							]
+						],
+						"settings":
+						{
+							"codeintel": true,
+							"codeintel_config":
+							{
+								"JavaScript":
+								{
+									"codeintel_max_recursive_dir_depth": 2,
+									"codeintel_scan_files_in_project": false,
+									"javascriptExtraPaths":
+									[
+									]
+								},
+								"PHP":
+								{
+									"codeintel_max_recursive_dir_depth": 5,
+									"codeintel_scan_files_in_project": false,
+									"phpExtraPaths":
+									[
+									]
+								},
+								"Python":
+								{
+									"env":
+									{
+									}
+								}
+							},
+							"codeintel_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_live": true,
+							"codeintel_live_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_max_recursive_dir_depth": 10,
+							"codeintel_scan_exclude_dir":
+							{
+								"JavaScript":
+								[
+									"/build/",
+									"/min/"
+								]
+							},
+							"codeintel_scan_files_in_project": true,
+							"codeintel_selected_catalogs":
+							[
+								"PyWin32",
+								"jQuery",
+								"Rails"
+							],
+							"codeintel_snippets": true,
+							"codeintel_syntax_map":
+							{
+								"Python Django": "Python"
+							},
+							"codeintel_tooltips": "popup",
+							"sublime_auto_complete": true,
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "processors/pop3/pop3.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 686,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								318,
+								318
 							]
 						],
 						"settings":
@@ -320,20 +500,20 @@
 					"type": "text"
 				},
 				{
-					"buffer": 1,
-					"file": "processors/pop3/pop3.go",
+					"buffer": 2,
+					"file": "processors/pop3/cmdprocessor/cmdprocessor.go",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 440,
+						"buffer_size": 390,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								22,
-								22
+								290,
+								290
 							]
 						],
 						"settings":
@@ -449,29 +629,28 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "structs/structs.go",
+					"buffer": 3,
+					"file": "parsers/textual/textual.go",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 718,
+						"buffer_size": 833,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								584,
-								584
+								481,
+								481
 							]
 						],
 						"settings":
 						{
-							"auto_name": "package structs",
 							"codeintel": true,
 							"codeintel_config":
 							{
@@ -579,11 +758,144 @@
 							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
-						"translation.x": -0.0,
-						"translation.y": 240.0,
+						"translation.x": 0.0,
+						"translation.y": 48.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "processors/pop3/client/client.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 860,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								700,
+								700
+							]
+						],
+						"settings":
+						{
+							"codeintel": true,
+							"codeintel_config":
+							{
+								"JavaScript":
+								{
+									"codeintel_max_recursive_dir_depth": 2,
+									"codeintel_scan_files_in_project": false,
+									"javascriptExtraPaths":
+									[
+									]
+								},
+								"PHP":
+								{
+									"codeintel_max_recursive_dir_depth": 5,
+									"codeintel_scan_files_in_project": false,
+									"phpExtraPaths":
+									[
+									]
+								},
+								"Python":
+								{
+									"env":
+									{
+									}
+								}
+							},
+							"codeintel_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_live": true,
+							"codeintel_live_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_max_recursive_dir_depth": 10,
+							"codeintel_scan_exclude_dir":
+							{
+								"JavaScript":
+								[
+									"/build/",
+									"/min/"
+								]
+							},
+							"codeintel_scan_files_in_project": true,
+							"codeintel_selected_catalogs":
+							[
+								"PyWin32",
+								"jQuery",
+								"Rails"
+							],
+							"codeintel_snippets": true,
+							"codeintel_syntax_map":
+							{
+								"Python Django": "Python"
+							},
+							"codeintel_tooltips": "popup",
+							"sublime_auto_complete": true,
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 37.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
 					"type": "text"
 				}
 			]
@@ -595,7 +907,7 @@
 	},
 	"input":
 	{
-		"height": 0.0
+		"height": 32.0
 	},
 	"layout":
 	{
@@ -620,7 +932,31 @@
 		]
 	},
 	"menu_visible": false,
+	"output.9o:///home/giorgio/go/src/github.com/trapped/gomaild/processors/pop3":
+	{
+		"height": 106.0
+	},
+	"output.9o:///home/giorgio/go/src/github.com/trapped/gomaild/processors/pop3/client":
+	{
+		"height": 106.0
+	},
+	"output.9o:///home/giorgio/go/src/github.com/trapped/gomaild/processors/pop3/cmdobject":
+	{
+		"height": 106.0
+	},
+	"output.9o:///home/giorgio/go/src/github.com/trapped/gomaild/processors/pop3/cmdparser":
+	{
+		"height": 106.0
+	},
+	"output.9o:///home/giorgio/go/src/github.com/trapped/gomaild/processors/pop3/cmdprocessor":
+	{
+		"height": 106.0
+	},
 	"output.9o:///home/giorgio/go/src/trapped/gomaild/processors/pop3":
+	{
+		"height": 106.0
+	},
+	"output.9o:///home/giorgio/go/src/trapped/gomaild/processors/pop3/cmdparser":
 	{
 		"height": 106.0
 	},

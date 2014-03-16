@@ -2,6 +2,7 @@ package pop3client
 
 import (
 	"bufio"
+	"github.com/trapped/gomaild/processors/pop3/cmdprocessor"
 	"log"
 	"net"
 	"time"
@@ -32,12 +33,18 @@ func (c *Client) LocalEP() string {
 	return c.Conn.LocalAddr().String()
 }
 
-func (c *Client) proc() {
+func (c *Client) Process() {
 	defer c.Conn.Close()
 	bufin := bufio.NewReader(c.Conn)
+	processor := cmdprocessor.Processor{CommandLock: false}
 	for c.KeepOpen {
 		line, err := bufin.ReadString('\n')
 		if err != nil {
+			log.Println(err)
+			return
+		}
+		_, err0 := c.Conn.Write([]byte(processor.Process(line)))
+		if err0 != nil {
 			log.Println(err)
 			return
 		}

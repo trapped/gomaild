@@ -6,27 +6,34 @@ import (
 	"net"
 	"os"
 	"strconv"
-	"time"
 )
 
-var (
-	PORT int  = 110
-	KEEP bool = true
-)
+type POP3 struct {
+	//Port to listen at
+	Port int
+	//Whether to keep accepting clients (doesn't prevent active clients from continuing their current sessions)
+	Keep bool
+}
 
-func Listen() {
-	listener, err := net.Listen("tcp", "0.0.0.0:"+strconv.Itoa(PORT))
+func (p *POP3) Listen() {
+	if p.Keep == false {
+		p.Keep = true
+	}
+	if p.Port == 0 {
+		p.Port = 110
+	}
+	listener, err := net.Listen("tcp", "0.0.0.0:"+strconv.Itoa(p.Port))
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
 	}
-	for KEEP {
+	for p.Keep {
 		client, err := listener.Accept()
 		if err != nil {
 			log.Println(err)
 			continue
 		}
 		cliobj := MakeClient(&listener, client)
-		go cliobj.proc()
+		go cliobj.Process()
 	}
 }

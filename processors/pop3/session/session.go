@@ -15,4 +15,5 @@ type Session struct {
 	Authenticated  bool
 	Username       string
 	Password       string
+	Quitted        bool
 }

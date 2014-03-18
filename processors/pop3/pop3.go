@@ -2,10 +2,16 @@ package pop3
 
 import (
 	. "github.com/trapped/gomaild/processors/pop3/client"
+	"github.com/trapped/gomaild/processors/pop3/cmdprocessor"
 	"log"
 	"net"
 	"os"
 	"strconv"
+	//POP3 commands
+	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/list"
+	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/pass"
+	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/stat"
+	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/user"
 )
 
 type POP3 struct {
@@ -16,12 +22,19 @@ type POP3 struct {
 }
 
 func (p *POP3) Listen() {
+	log.Println("POP3: Starting POP3 server")
 	if p.Keep == false {
 		p.Keep = true
 	}
 	if p.Port == 0 {
 		p.Port = 110
 	}
+	//Initialize POP3 commands
+	cmdprocessor.Commands["user"] = user.Process
+	cmdprocessor.Commands["pass"] = pass.Process
+	cmdprocessor.Commands["stat"] = stat.Process
+	cmdprocessor.Commands["list"] = list.Process
+
 	listener, err := net.Listen("tcp", "0.0.0.0:"+strconv.Itoa(p.Port))
 	if err != nil {
 		log.Println(err)

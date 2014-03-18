@@ -5,8 +5,12 @@ import (
 	"github.com/trapped/gomaild/config"
 	"github.com/trapped/gomaild/parsers/textual"
 	"github.com/trapped/gomaild/processors/pop3/cmdprocessor"
+	"github.com/trapped/gomaild/processors/pop3/locker"
+	"github.com/trapped/gomaild/processors/pop3/session"
 	"log"
 	"net"
+	"os"
+	"path"
 	"strings"
 	"time"
 )
@@ -39,7 +43,9 @@ func (c *Client) LocalEP() string {
 func (c *Client) Process() {
 	defer c.Conn.Close()
 	bufin := bufio.NewReader(c.Conn)
-	processor := cmdprocessor.Processor{}
+	processor := cmdprocessor.Processor{
+		Session: &session.Session{},
+	}
 	greeting := "+OK"
 	if config.Settings["pop3"] != nil && len(config.Settings["pop3"]["greeting"]) >= 1 && strings.TrimSpace(config.Settings["pop3"]["greeting"][0].(textual.Command).Arguments[1]) != "" {
 		greeting += " " + config.Settings["pop3"]["greeting"][0].(textual.Command).Arguments[1]
@@ -50,6 +56,9 @@ func (c *Client) Process() {
 		return
 	}
 	for c.KeepOpen {
+		if processor.Session.Quitted {
+			break
+		}
 		line, err := bufin.ReadString('\n')
 		if err != nil {
 			log.Println(err)
@@ -61,5 +70,6 @@ func (c *Client) Process() {
 			return
 		}
 	}
+	locker.Unlock(path.Dir(os.Args[0]) + "/mailboxes/" + processor.Session.Username)
 	c.End = time.Now()
 }

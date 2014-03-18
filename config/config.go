@@ -13,22 +13,22 @@ import (
 var Settings map[string]map[string][]interface{} = make(map[string]map[string][]interface{}, 0)
 
 var parser = textual.Parser{
-	OpenBrackets:      true,
-	Brackets:          "``",
-	Trim:              true,
-	IgnoreEmpty:       true,
-	ArgumentSeparator: ' ',
+	OpenBrackets:       true,
+	Brackets:           "``",
+	Trim:               true,
+	IgnoreEmpty:        true,
+	ArgumentSeparators: []byte{' ', '\n'},
 }
 
 func Read() {
 	currentfolder := path.Dir(os.Args[0])
-	log.Println("Searching configuration files with pattern", currentfolder+"/*.conf")
+	log.Println("Configuration: Searching files with pattern", currentfolder+"/*.conf")
 	confs, err := filepath.Glob(currentfolder + "/*.conf")
 	if err != nil {
-		log.Println("Error finding configuration files:", err)
+		log.Println("Configuration: Error finding files:", err)
 		return
 	}
-	log.Println("Found", len(confs), "configuration files")
+	log.Println("Configuration: Found", len(confs), "files")
 	for _, v := range confs {
 		ParseConfig(v)
 	}
@@ -36,10 +36,10 @@ func Read() {
 
 func ParseConfig(s string) {
 	basename := strings.TrimSuffix(path.Base(s), ".conf")
-	log.Println("Parsing configuration file", basename)
+	log.Println("Configuration: Parsing file", basename)
 	file, err := ioutil.ReadFile(s)
 	if err != nil {
-		log.Println("Error reading config file", basename)
+		log.Println("Configuration: Error reading config file", basename)
 		return
 	}
 	filetext := string(file)

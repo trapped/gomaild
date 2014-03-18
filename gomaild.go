@@ -9,8 +9,7 @@ import (
 
 func main() {
 	config.Read()
-	fmt.Println("Current settings:", config.Settings)
-	log.Println("Starting gomaild")
+	log.Println("gomaild: Starting gomaild")
 	//Start POP3 server
 	_pop3 := pop3.POP3{Port: 110, Keep: true}
 	go _pop3.Listen()
@@ -20,8 +19,9 @@ func main() {
 		if cmd == "q" {
 			break
 		} else if cmd == "rc" {
+			log.Println("gomaild: Reloading configuration")
 			config.Read()
-			fmt.Println("Current settings:", config.Settings)
+			log.Println("gomaild: Reloaded configuration")
 		}
 	}
 }

@@ -7,7 +7,7 @@ import (
 
 var (
 	//Map containing commands and their relative function (to be executed when a command is issued)
-	Commands map[string]func(*Session, textual.Command) (string, error)
+	Commands map[string]func(*Session, textual.Command) (string, error) = make(map[string]func(*Session, textual.Command) (string, error), 0)
 )
 
 type Processor struct {
@@ -16,12 +16,12 @@ type Processor struct {
 
 func (p *Processor) Process(s string) string {
 	parser := textual.Parser{
-		Prefix:            "",
-		Suffix:            "",
-		OpenBrackets:      false,
-		Brackets:          "",
-		Trim:              true,
-		ArgumentSeparator: byte(' '),
+		Prefix:             "",
+		Suffix:             "",
+		OpenBrackets:       false,
+		Brackets:           "",
+		Trim:               true,
+		ArgumentSeparators: []byte{' '},
 	}
 	z := parser.Parse(s)
 	if _, exists := Commands[z.Name]; exists {

@@ -5,14 +5,14 @@ import (
 )
 
 type Parser struct {
-	Prefix            string
-	Suffix            string
-	OpenBrackets      bool
-	Brackets          string
-	ArgumentSeparator byte
-	MaxCmdLength      int
-	Trim              bool
-	IgnoreEmpty       bool
+	Prefix             string
+	Suffix             string
+	OpenBrackets       bool
+	Brackets           string
+	ArgumentSeparators []byte
+	MaxCmdLength       int
+	Trim               bool
+	IgnoreEmpty        bool
 }
 
 type Command struct {
@@ -40,26 +40,26 @@ func (p *Parser) Parse(s string) Command {
 		considerwhites := false
 		for i := 0; i < len(s); i++ {
 			z := s[i]
-			if z == p.Brackets[0] {
+			if z == p.Brackets[0] && inbrackets == false {
 				inbrackets = true
 				considerwhites = true
 				if !p.OpenBrackets {
 					arg += string(z)
 				}
-			} else if z == p.Brackets[1] {
+			} else if z == p.Brackets[1] && inbrackets == true {
 				inbrackets = false
+				considerwhites = false
 				if !p.OpenBrackets {
 					arg += string(z)
 				}
 			} else {
 				if !inbrackets {
-					if z != p.ArgumentSeparator {
+					if !inarray(p.ArgumentSeparators, z) {
 						arg += string(z)
 					} else {
 						if (strings.TrimSpace(arg) != "" || !p.IgnoreEmpty || considerwhites) && arg != "" {
 							cmd.Arguments = append(cmd.Arguments, arg)
 							arg = ""
-							considerwhites = false
 						}
 					}
 				} else {
@@ -74,7 +74,7 @@ func (p *Parser) Parse(s string) Command {
 			}
 		}
 	} else {
-		cmd.Arguments = strings.Split(s, string(p.ArgumentSeparator))
+		cmd.Arguments = strings.Split(s, string(p.ArgumentSeparators[0]))
 		if p.IgnoreEmpty {
 			for i, v := range cmd.Arguments {
 				if strings.TrimSpace(v) == "" {
@@ -90,4 +90,13 @@ func (p *Parser) Parse(s string) Command {
 	}
 
 	return cmd
+}
+
+func inarray(a []byte, b byte) bool {
+	for _, v := range a {
+		if b == v {
+			return true
+		}
+	}
+	return false
 }

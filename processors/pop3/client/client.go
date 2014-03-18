@@ -2,9 +2,12 @@ package pop3client
 
 import (
 	"bufio"
+	"github.com/trapped/gomaild/config"
+	"github.com/trapped/gomaild/parsers/textual"
 	"github.com/trapped/gomaild/processors/pop3/cmdprocessor"
 	"log"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -36,7 +39,16 @@ func (c *Client) LocalEP() string {
 func (c *Client) Process() {
 	defer c.Conn.Close()
 	bufin := bufio.NewReader(c.Conn)
-	processor := cmdprocessor.Processor{CommandLock: false}
+	processor := cmdprocessor.Processor{}
+	greeting := "+OK"
+	if config.Settings["pop3"] != nil && len(config.Settings["pop3"]["greeting"]) >= 1 && strings.TrimSpace(config.Settings["pop3"]["greeting"][0].(textual.Command).Arguments[1]) != "" {
+		greeting += " " + config.Settings["pop3"]["greeting"][0].(textual.Command).Arguments[1]
+	}
+	_, errX := c.Conn.Write([]byte(greeting + "\r\n"))
+	if errX != nil {
+		log.Println(errX)
+		return
+	}
 	for c.KeepOpen {
 		line, err := bufin.ReadString('\n')
 		if err != nil {
@@ -45,7 +57,7 @@ func (c *Client) Process() {
 		}
 		_, err0 := c.Conn.Write([]byte(processor.Process(line)))
 		if err0 != nil {
-			log.Println(err)
+			log.Println(err0)
 			return
 		}
 	}

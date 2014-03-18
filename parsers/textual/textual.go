@@ -12,6 +12,7 @@ type Parser struct {
 	ArgumentSeparator byte
 	MaxCmdLength      int
 	Trim              bool
+	IgnoreEmpty       bool
 }
 
 type Command struct {
@@ -35,47 +36,54 @@ func (p *Parser) Parse(s string) Command {
 	}
 	if p.Brackets != "" {
 		arg := ""
-		ob := false
+		inbrackets := false
+		considerwhites := false
 		for i := 0; i < len(s); i++ {
 			z := s[i]
 			if z == p.Brackets[0] {
-				ob = true
+				inbrackets = true
+				considerwhites = true
 				if !p.OpenBrackets {
 					arg += string(z)
 				}
 			} else if z == p.Brackets[1] {
-				ob = false
+				inbrackets = false
 				if !p.OpenBrackets {
 					arg += string(z)
 				}
 			} else {
-				if !ob {
+				if !inbrackets {
 					if z != p.ArgumentSeparator {
-						fmt.Println("adding")
 						arg += string(z)
 					} else {
-						if arg != "" {
-							fmt.Println("appending")
+						if (strings.TrimSpace(arg) != "" || !p.IgnoreEmpty || considerwhites) && arg != "" {
 							cmd.Arguments = append(cmd.Arguments, arg)
 							arg = ""
+							considerwhites = false
 						}
 					}
 				} else {
-					fmt.Println("adding")
 					arg += string(z)
 				}
 			}
 			if i == len(s)-1 {
-				if arg != "" {
-					fmt.Println("appending")
+				if (strings.TrimSpace(arg) != "" || !p.IgnoreEmpty || considerwhites) && arg != "" {
 					cmd.Arguments = append(cmd.Arguments, arg)
+					considerwhites = false
 				}
 			}
 		}
 	} else {
 		cmd.Arguments = strings.Split(s, string(p.ArgumentSeparator))
+		if p.IgnoreEmpty {
+			for i, v := range cmd.Arguments {
+				if strings.TrimSpace(v) == "" {
+					cmd.Arguments = append(cmd.Arguments[:i], cmd.Arguments[i+1:]...)
+				}
+			}
+		}
 	}
-	if p.MaxCmdLength != -1 {
+	if p.MaxCmdLength > 0 {
 		cmd.Name = s[0:p.MaxCmdLength]
 	} else {
 		cmd.Name = cmd.Arguments[0]

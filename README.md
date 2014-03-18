@@ -29,15 +29,15 @@ Individual packages are described in detail in their own README file, found in t
 ###Configuration
 
 gomaild reads and parses (using the `parsers/textual` package, more on its use later) all the .conf files in its executable's root directory.
-The configuration files' content is then stored in the `Settings` variable of the `config` package: the variable is a Go map (a key-value store), with strings (the various filenames without the .conf extension) as keys and maps as values; these maps have, again, strings as keys - but an array of interface{} (Go's unspecified value type, to allow for reflection casting) as values.
+The configuration files' content is then stored in the `Settings` variable of the `config` package: the variable is a Go map (a key-value store), with strings (the various filenames without the `.conf` extension) as keys and maps as values; these maps have, again, strings as keys - but an array of `interface{}` (Go's unspecified value type, to allow for reflection casting) as values.
 The configuration file syntax (which is also briefly described in the gomaild.conf file) is as follows:
 
 - the hashtag character (`#`) opens and closes comment blocks; comment blocks are not closed until a second hashtag;
 - the first argument (argument number 0), here referred to as "keyword", defines the key in the current files' second-level map for the whole statement;
-- arguments are wrapped with the ````` character (ASCII backtick) if they require escaping of whitespace characters (as " ", tabs, newlines...);
+- arguments are wrapped with the `` ` character (ASCII backtick) if they require escaping of whitespace characters (as " ", tabs, newlines...);
 - whitespace characters are trimmed away from the start and end of statements;
 - statements end with the `;` character (ASCII semicolon); omitting it in a line results in a multiline statement;
-- semicolons (`;`) are *prohibited* in arguments, as their occurrence would result in a premature end of the statement;
+- semicolons (`;`) are **prohibited** in arguments, as their occurrence would result in a premature end of the statement;
 
 Statements such as user account definitions defined in the main file (`gomaild.conf`) are to be considered "master" or "general": servers will look in the `gomaild` map first, and then in their own.
-*Note*: servers won't look in the main map for their specific settings (for example, the POP3 server will only check the existence of a user-specified greeting in the `pop3` map).
+**Note**: servers won't look in the main map for their specific settings (for example, the POP3 server will only check the existence of a user-specified greeting in the `pop3` map).

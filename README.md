@@ -14,7 +14,7 @@ gomaild is still at an early stage of development: it's not recommended to deplo
 |	Protocol	|	Status	|
 |	--------	|	------	|
 |	SMTP		|	Already implemented in another project, awaits porting	|
-|	POP3		|	Currently implementing	|
+|	POP3		|	Implemented, to optimize	|
 |	IMAP4		|	Not yet implemented	|
 
 ###Packages

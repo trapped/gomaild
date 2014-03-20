@@ -2,37 +2,76 @@ package pass
 
 import (
 	"errors"
+	"github.com/trapped/gomaild/locker"
+	"github.com/trapped/gomaild/mailboxes"
 	. "github.com/trapped/gomaild/parsers/textual"
-	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/stat"
-	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/user"
-	"github.com/trapped/gomaild/processors/pop3/locker"
 	. "github.com/trapped/gomaild/processors/pop3/session"
 	"log"
-	"os"
-	"path"
 	"strconv"
+	"strings"
 )
 
-func Process(session *Session, c Command) (string, error) {
-	if !session.Authenticated && session.Username != "" && session.Password == "" && session.State == AUTHORIZATION {
-		log.Println("POP3: Attempt to use PASS", c.Arguments[1], "with USER", session.Username)
-		cmd, err := user.GetUser(session.Username)
-		if err != nil || cmd.Arguments[3] != c.Arguments[1] {
-			session.Username = ""
-			return "", errors.New("incorrect username/password combination")
-		} else {
-			if errl := locker.Lock(path.Dir(os.Args[0]) + "/mailboxes/" + session.Username); errl != nil {
-				session.Username = ""
-				return "", errors.New("maildrop " + errl.Error())
-			}
-			session.Password = c.Arguments[1]
-			session.Authenticated = true
-			session.State = TRANSACTION
-			count, octets := stat.Stat(session)
-			return session.Username + "'s maildrop has " + strconv.Itoa(count) + " messages (" + strconv.Itoa(octets) + " octets)", nil
-		}
-	}
+func Process(session *Session, c Statement) (string, error) {
+	errorslice := []string{}
+	result := ""
+	goto checks
+
+returnerror:
 	session.Username = ""
 	session.Password = ""
-	return "", errors.New("wrong state")
+	if len(errorslice) != 0 {
+		result = strings.Join(errorslice, ", ")
+		return "", errors.New(result)
+	}
+
+checks:
+	if session.State != AUTHORIZATION {
+		errorslice = append(errorslice, "wrong session state")
+	}
+	if session.Authenticated {
+		errorslice = append(errorslice, "already authenticated")
+	}
+	if session.Username == "" {
+		errorslice = append(errorslice, "use command USER first")
+	}
+	if session.Password != "" {
+		errorslice = append(errorslice, "session password already set")
+	}
+	if len(c.Arguments) == 1 {
+		errorslice = append(errorslice, "password can't be empty")
+	}
+	if len(c.Arguments) > 2 {
+		errorslice = append(errorslice, "too many arguments")
+	}
+
+	if len(errorslice) != 0 {
+		goto returnerror
+	}
+
+	log.Println("POP3:", "PASS command issued by", session.RemoteEP, "with", session.Username, "and `"+session.Password+"`")
+
+	user, erra := mailboxes.GetUser(session.Username)
+	if erra != nil {
+		errorslice = append(errorslice, "no such username/password combination")
+		goto returnerror
+	}
+
+	if user.Arguments[3] != c.Arguments[1] {
+		errorslice = append(errorslice, "no such username/password combination")
+		goto returnerror
+	}
+
+	lockerr := locker.Lock(mailboxes.GetMailbox(session.Username))
+	if lockerr != nil {
+		errorslice = append(errorslice, "maildrop "+lockerr.Error())
+		goto returnerror
+	}
+
+	session.Password = c.Arguments[1]
+	session.Authenticated = true
+	session.State = TRANSACTION
+	count, octets := mailboxes.Stat(session.Username, false)
+	result = session.Username + "'s maildrop has " + strconv.Itoa(count) + " messages (" + strconv.Itoa(octets) + " octets)"
+
+	return result, nil
 }

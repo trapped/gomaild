@@ -3,59 +3,59 @@ package user
 import (
 	"errors"
 	"github.com/trapped/gomaild/config"
+	"github.com/trapped/gomaild/mailboxes"
 	. "github.com/trapped/gomaild/parsers/textual"
 	. "github.com/trapped/gomaild/processors/pop3/session"
 	"log"
-	"strconv"
+	"strings"
 )
 
-func Process(session *Session, c Command) (string, error) {
-	if !session.Authenticated && session.Username == "" && session.Password == "" && session.State == AUTHORIZATION {
-		log.Println("POP3: Attempt to use USER", c.Arguments[1])
-		success := false
-		if c.Arguments[1] != "" {
-			if config.Settings["pop3"]["secure_user"] != nil || len(config.Settings["pop3"]["secure_user"]) >= 1 {
-				if su, _ := strconv.ParseBool(config.Settings["pop3"]["secure_user"][0].(Command).Arguments[1]); su {
-					success = true
-				}
-			} else {
-				_, err := GetUser(c.Arguments[1])
-				if err != nil {
-					success = false
-				} else {
-					success = true
-				}
-			}
-			if success {
-				session.Username = c.Arguments[1]
-				return "user may exist", nil
-			} else {
-				return "", errors.New("no such user")
-			}
-		} else {
-			return "", errors.New("username can't be empty")
-		}
-	}
-	session.Username = ""
-	return "", errors.New("wrong state")
-}
+func Process(session *Session, c Statement) (string, error) {
+	errorslice := []string{}
+	result := ""
+	goto checks
 
-func GetUser(s string) (Command, error) {
-	if config.Settings["gomaild"] != nil {
-		for _, v := range config.Settings["gomaild"]["user"] {
-			z := v.(Command)
-			if z.Arguments[1] == s {
-				return z, nil
-			}
+returnerror:
+	if len(errorslice) != 0 {
+		session.Username = ""
+		session.Password = ""
+		result = strings.Join(errorslice, ", ")
+		return "", errors.New(result)
+	}
+
+checks:
+	if session.State != AUTHORIZATION {
+		errorslice = append(errorslice, "wrong session state")
+	}
+	if session.Authenticated {
+		errorslice = append(errorslice, "already authenticated")
+	}
+	if session.Username != "" {
+		errorslice = append(errorslice, "user already set, use command PASS")
+	}
+	if len(c.Arguments) == 1 {
+		errorslice = append(errorslice, "username can't be empty")
+	}
+	if len(c.Arguments) > 2 {
+		errorslice = append(errorslice, "too many arguments")
+	}
+
+	if len(errorslice) != 0 {
+		goto returnerror
+	}
+
+	log.Println("POP3:", "USER command issued by", session.RemoteEP, "with", session.Username)
+
+	if config.Settings["pop3"]["secure_user"] == nil || len(config.Settings["pop3"]["secure_user"]) == 0 {
+		_, erra := mailboxes.GetUser(c.Arguments[1])
+		if erra != nil {
+			errorslice = append(errorslice, "no such user")
+			goto returnerror
 		}
 	}
-	if config.Settings["pop3"] != nil {
-		for _, v := range config.Settings["pop3"]["user"] {
-			z := v.(Command)
-			if z.Arguments[1] == s {
-				return z, nil
-			}
-		}
-	}
-	return Command{}, errors.New("no such user")
+
+	session.Username = c.Arguments[1]
+	result += "user might exist"
+
+	return result, nil
 }

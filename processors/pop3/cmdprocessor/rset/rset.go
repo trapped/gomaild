@@ -1,4 +1,4 @@
-package stat
+package rset
 
 import (
 	"errors"
@@ -42,9 +42,12 @@ checks:
 		goto returnerror
 	}
 
-	log.Println("POP3:", "STAT command issued by", session.RemoteEP, "with", session.Username)
+	log.Println("POP3:", "RSET command issued by", session.RemoteEP, "with", session.Username)
+
+	session.Retrieved = []interface{}{}
+	session.Deleted = []interface{}{}
 
 	count, octets := mailboxes.Stat(session.Username, false)
 
-	return strconv.Itoa(count) + " " + strconv.Itoa(octets), nil
+	return "maildrop has " + strconv.Itoa(count) + " messages (" + strconv.Itoa(octets) + " octets)", nil
 }

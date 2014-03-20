@@ -9,11 +9,12 @@ var (
 )
 
 type Session struct {
-	CommandLock    bool
-	CommandHistory []string
-	State          S_State
-	Authenticated  bool
-	Username       string
-	Password       string
-	Quitted        bool
+	RemoteEP      string
+	State         S_State
+	Authenticated bool
+	Username      string
+	Password      string
+	Quitted       bool
+	Retrieved     []interface{}
+	Deleted       []interface{}
 }

@@ -8,8 +8,13 @@ import (
 	"os"
 	"strconv"
 	//POP3 commands
+	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/dele"
 	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/list"
+	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/noop"
 	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/pass"
+	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/quit"
+	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/retr"
+	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/rset"
 	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/stat"
 	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/user"
 )
@@ -34,19 +39,25 @@ func (p *POP3) Listen() {
 	cmdprocessor.Commands["pass"] = pass.Process
 	cmdprocessor.Commands["stat"] = stat.Process
 	cmdprocessor.Commands["list"] = list.Process
+	cmdprocessor.Commands["retr"] = retr.Process
+	cmdprocessor.Commands["dele"] = dele.Process
+	cmdprocessor.Commands["noop"] = noop.Process
+	cmdprocessor.Commands["quit"] = quit.Process
+	cmdprocessor.Commands["rset"] = rset.Process
 
 	listener, err := net.Listen("tcp", "0.0.0.0:"+strconv.Itoa(p.Port))
 	if err != nil {
-		log.Println(err)
+		log.Println("POP3:", err)
 		os.Exit(1)
 	}
 	for p.Keep {
 		client, err := listener.Accept()
 		if err != nil {
-			log.Println(err)
+			log.Println("POP3:", err)
 			continue
 		}
 		cliobj := MakeClient(&listener, client)
+		log.Println("POP3: Accepting client", cliobj.RemoteEP())
 		go cliobj.Process()
 	}
 }

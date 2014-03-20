@@ -1,8 +1,7 @@
-package list
+package dele
 
 import (
 	"errors"
-	"github.com/trapped/gomaild/mailboxes"
 	. "github.com/trapped/gomaild/parsers/textual"
 	"github.com/trapped/gomaild/processors/pop3/message"
 	. "github.com/trapped/gomaild/processors/pop3/session"
@@ -35,32 +34,32 @@ checks:
 	if len(c.Arguments) > 2 {
 		errorslice = append(errorslice, "too many arguments")
 	}
+	if len(c.Arguments) == 1 {
+		errorslice = append(errorslice, "message ID can't be empty")
+	}
 
 	if len(errorslice) != 0 {
 		goto returnerror
 	}
 
-	log.Println("POP3:", "LIST command issued by", session.RemoteEP, "with", session.Username)
+	log.Println("POP3:", "DELE command issued by", session.RemoteEP, "with", session.Username)
 
 	messages := message.Index(session)
-	if len(c.Arguments) == 1 {
-		count, octets := mailboxes.Stat(session.Username, false)
-		result = strconv.Itoa(count) + " messages (" + strconv.Itoa(octets) + " octets)\r\n"
-		for i := 0; i < len(messages); i++ {
-			result += strconv.Itoa(messages[i].ID) + " " + strconv.Itoa(int(messages[i].File.Size())) + "\r\n"
-		}
-		result += "."
-	} else {
-		for _, v := range messages {
-			if strconv.Itoa(v.ID) == c.Arguments[1] {
-				result = strconv.Itoa(v.ID) + " " + strconv.Itoa(int(v.File.Size()))
-				break
+
+	for _, v := range messages {
+		if strconv.Itoa(v.ID) == c.Arguments[1] {
+			if !message.MessagesContain(session.Deleted, v.ID) {
+				session.Deleted = append(session.Deleted, v)
+				result = "message " + strconv.Itoa(v.ID) + " deleted"
+			} else {
+				result = "message " + strconv.Itoa(v.ID) + " already deleted"
 			}
+			break
 		}
-		if result == "" {
-			errorslice = append(errorslice, "no such message; "+strconv.Itoa(len(messages))+" messages in maildrop")
-			goto returnerror
-		}
+	}
+	if result == "" {
+		errorslice = append(errorslice, "no such message; "+strconv.Itoa(len(messages))+" messages in maildrop")
+		goto returnerror
 	}
 
 	return result, nil

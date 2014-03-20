@@ -15,14 +15,14 @@ type Parser struct {
 	IgnoreEmpty        bool
 }
 
-type Command struct {
+type Statement struct {
 	Raw       string
 	Name      string
 	Arguments []string
 }
 
-func (p *Parser) Parse(s string) Command {
-	cmd := Command{
+func (p *Parser) Parse(s string) Statement {
+	cmd := Statement{
 		Raw: s,
 	}
 	if p.Trim {

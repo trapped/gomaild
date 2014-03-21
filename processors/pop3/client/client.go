@@ -11,6 +11,7 @@ import (
 	"net"
 	"os"
 	"path"
+	"strconv"
 	"time"
 )
 
@@ -44,7 +45,7 @@ func (c *Client) LocalEP() string {
 }
 
 //Send sends a line of text, usually obtained from the execution of a POP3 command.
-//Send already appends the CRLF termination octet pair.
+//Send already appends the CRLF (0x0a 0x0d) termination octet pair.
 func (c *Client) Send(s string) error {
 	_, err := c.Conn.Write([]byte(s + "\r\n"))
 	return err
@@ -63,8 +64,11 @@ func (c *Client) Process() {
 		Session: &session.Session{RemoteEP: c.RemoteEP()},
 	}
 
-	//Send the POP3 session-start greeting eventually set in the "pop3.conf" configuration file.
-	err1 := c.Send("+OK " + sentences.StartGreeting())
+	//Set the POP3 session unique shared
+	processor.Session.Shared = "<" + strconv.Itoa(os.Getpid()) + "." + strconv.Itoa(time.Now().Nanosecond()) + ">"
+
+	//Send the POP3 session-start greeting eventually set in the "pop3.conf" configuration file and the shared.
+	err1 := c.Send("+OK " + sentences.StartGreeting() + " " + processor.Session.Shared)
 	//If an error occurs, log it and finalize the connection.
 	if err1 != nil {
 		log.Println("POP3:", err1)
@@ -79,7 +83,7 @@ func (c *Client) Process() {
 		}
 
 		//Read a line from the network stream.
-		//The POP3 protocol defines the command termination octet pair as CRLF (0x0a 0x0d); however, we simply read until a LF occurs (the termination octet pair is stripped away later).
+		//The POP3 protocol defines the command termination octet pair as CRLF (0x0d 0x0a); however, we simply read until a LF occurs (the termination octet pair is stripped away later).
 		line, err2a := bufin.ReadString('\n')
 		//If an error occurs, log it and finalize the connection.
 		if err2a != nil {

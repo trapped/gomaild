@@ -17,4 +17,5 @@ type Session struct {
 	Quitted       bool
 	Retrieved     []interface{}
 	Deleted       []interface{}
+	Shared        string
 }

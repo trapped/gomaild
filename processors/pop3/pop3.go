@@ -17,6 +17,10 @@ import (
 	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/rset"
 	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/stat"
 	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/user"
+	//Additional POP3 commands
+	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/apop"
+	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/top"
+	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/uidl"
 )
 
 type POP3 struct {
@@ -44,6 +48,10 @@ func (p *POP3) Listen() {
 	cmdprocessor.Commands["noop"] = noop.Process
 	cmdprocessor.Commands["quit"] = quit.Process
 	cmdprocessor.Commands["rset"] = rset.Process
+	//Additional (non-compulsory in RFC1725) commands
+	cmdprocessor.Commands["uidl"] = uidl.Process
+	cmdprocessor.Commands["top"] = top.Process
+	cmdprocessor.Commands["apop"] = apop.Process
 
 	listener, err := net.Listen("tcp", "0.0.0.0:"+strconv.Itoa(p.Port))
 	if err != nil {

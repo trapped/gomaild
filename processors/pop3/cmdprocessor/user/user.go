@@ -44,7 +44,7 @@ checks:
 		goto returnerror
 	}
 
-	log.Println("POP3:", "USER command issued by", session.RemoteEP, "with", session.Username)
+	log.Println("POP3:", "USER command issued by", session.RemoteEP, "with", c.Arguments[1])
 
 	if config.Settings["pop3"]["secure_user"] == nil || len(config.Settings["pop3"]["secure_user"]) == 0 {
 		_, erra := mailboxes.GetUser(c.Arguments[1])

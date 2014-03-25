@@ -1,12 +1,12 @@
-//Package client defines a set of structs and methods to handle a POP3 client.
+//Package client defines a set of structs and methods to handle a SMTP client.
 package client
 
 import (
 	"bufio"
 	"github.com/trapped/gomaild/locker"
-	"github.com/trapped/gomaild/processors/pop3/cmdprocessor"
-	"github.com/trapped/gomaild/processors/pop3/sentences"
-	"github.com/trapped/gomaild/processors/pop3/session"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor"
+	"github.com/trapped/gomaild/processors/smtp/sentences"
+	"github.com/trapped/gomaild/processors/smtp/session"
 	"log"
 	"net"
 	"os"
@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-//Client is the structure used to store some useful parts of the POP3 clients.
+//Client is the structure used to store some useful parts of the SMTP clients.
 type Client struct {
 	Parent   *net.Listener //The client's parent listener.
 	Conn     net.Conn      //The client's network connection.
@@ -44,7 +44,7 @@ func (c *Client) LocalEP() string {
 	return c.Conn.LocalAddr().String()
 }
 
-//Send sends a line of text, usually obtained from the execution of a POP3 command.
+//Send sends a line of text, usually obtained from the execution of a SMTP command.
 //Send already appends the CRLF (0x0a 0x0d) termination octet pair.
 func (c *Client) Send(s string) error {
 	_, err := c.Conn.Write([]byte(s + "\r\n"))
@@ -64,26 +64,26 @@ func (c *Client) Process() {
 		Session: &session.Session{RemoteEP: c.RemoteEP()},
 	}
 
-	//Set the POP3 session unique shared
+	//Set the SMTP session unique shared
 	processor.Session.Shared = "<" + strconv.Itoa(os.Getpid()) + "." + strconv.Itoa(time.Now().Nanosecond()) + ">"
 
-	//Send the POP3 session-start greeting eventually set in the "pop3.conf" configuration file and the shared.
-	err1 := c.Send("+OK " + sentences.StartGreeting() + " " + processor.Session.Shared)
+	//Send the SMTP session-start greeting eventually set in the "smtp.conf" configuration file and the shared.
+	err1 := c.Send("220 " + sentences.StartGreeting() + " " + processor.Session.Shared)
 	//If an error occurs, log it and finalize the connection.
 	if err1 != nil {
-		log.Println("POP3:", err1)
+		log.Println("SMTP:", err1)
 		return
 	}
 
 	//Stop looping if the KeepOpen property of the client becomes false.
 	for c.KeepOpen {
-		//Stop looping if the client quits its POP3 session.
+		//Stop looping if the client quits its SMTP session.
 		if processor.Session.Quitted {
 			break
 		}
 
 		//Read a line from the network stream.
-		//The POP3 protocol defines the command termination octet pair as CRLF (0x0d 0x0a); however, we simply read until a LF occurs (the termination octet pair is stripped away later).
+		//The SMTP protocol defines the command termination octet pair as CRLF (0x0d 0x0a); however, we simply read until a LF occurs (the termination octet pair is stripped away later).
 		line, err2a := bufin.ReadString('\n')
 		//If an error occurs, log it and finalize the connection.
 		if err2a != nil {
@@ -101,13 +101,13 @@ func (c *Client) Process() {
 	}
 
 	//If the client opened a mailbox, unlock it using the locker.
-	if processor.Session.Authenticated {
-		locker.Unlock(path.Dir(os.Args[0]) + "/mailboxes/" + processor.Session.Username)
-	}
+	//if processor.Session.Authenticated {
+	//	locker.Unlock(path.Dir(os.Args[0]) + "/mailboxes/" + processor.Session.Username)
+	//}
 
 	//Set the Client's connection end time to time.Now().
 	c.End = time.Now()
 
 	//Log the connection ending, with the remote endpoint.
-	log.Println("POP3: Disconnecting", c.RemoteEP())
+	log.Println("SMTP: Disconnecting", c.RemoteEP())
 }

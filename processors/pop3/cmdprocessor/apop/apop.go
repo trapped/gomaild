@@ -62,6 +62,12 @@ checks:
 	digest := hex.EncodeToString(hash.Sum(nil))
 
 	if c.Arguments[2] == digest {
+		lockerr := locker.Lock(mailboxes.GetMailbox(session.Username))
+		if lockerr != nil {
+			errorslice = append(errorslice, "[IN-USE] maildrop "+lockerr.Error())
+			goto returnerror
+		}
+
 		session.Username = c.Arguments[1]
 		session.Password = c.Arguments[1]
 		session.Authenticated = true

@@ -67,7 +67,7 @@ checks:
 				for f := 0; f < 5; f++ {
 					part := v.Path + strconv.Itoa(v.ID) + v.File.ModTime().String()
 					hash := md5.New()
-					hash.Write([]byte(part))
+					hash.Write([]byte(part + messageuid))
 					hex.EncodeToString(hash.Sum(nil))
 					messageuid += hex.EncodeToString(hash.Sum(nil))
 				}

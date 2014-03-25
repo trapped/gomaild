@@ -63,7 +63,7 @@ checks:
 
 	lockerr := locker.Lock(mailboxes.GetMailbox(session.Username))
 	if lockerr != nil {
-		errorslice = append(errorslice, "maildrop "+lockerr.Error())
+		errorslice = append(errorslice, "[IN-USE] maildrop "+lockerr.Error())
 		goto returnerror
 	}
 

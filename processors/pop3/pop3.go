@@ -19,6 +19,7 @@ import (
 	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/user"
 	//Additional POP3 commands
 	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/apop"
+	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/capa"
 	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/top"
 	"github.com/trapped/gomaild/processors/pop3/cmdprocessor/uidl"
 )
@@ -52,6 +53,7 @@ func (p *POP3) Listen() {
 	cmdprocessor.Commands["uidl"] = uidl.Process
 	cmdprocessor.Commands["top"] = top.Process
 	cmdprocessor.Commands["apop"] = apop.Process
+	cmdprocessor.Commands["capa"] = apop.Process
 
 	listener, err := net.Listen("tcp", "0.0.0.0:"+strconv.Itoa(p.Port))
 	if err != nil {

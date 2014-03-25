@@ -1,6 +1,7 @@
 package message
 
 import (
+	"github.com/trapped/gomaild/locker"
 	"github.com/trapped/gomaild/mailboxes"
 	. "github.com/trapped/gomaild/processors/smtp/session"
 	"io/ioutil"
@@ -94,7 +95,7 @@ func Store(session *Session, m Message) error {
 	}
 	headers := strings.Split(hders, "\r\n")
 	if m.RemoteDomain != "" {
-		headers = append(headers, "X-Received-from: "+m.RemoteDomain)
+		headers = append(headers, "X-Received-From: "+m.RemoteDomain)
 	}
 	if m.Sender != "" {
 		headers = append(headers, "X-Sender: <"+m.Sender+">")
@@ -119,8 +120,10 @@ func Store(session *Session, m Message) error {
 	newfull := mheaders + "\r\n" + mbody
 
 	for _, v := range m.Recipients {
+		locker.MLock(mailboxes.GetMailbox(v))
 		ustatc, _ := mailboxes.Stat(v, true)
 		ioutil.WriteFile(mailboxes.GetMailbox(v)+"/unread/"+strconv.Itoa(ustatc)+".eml", []byte(newfull), 0777)
+		locker.MUnlock(mailboxes.GetMailbox(v))
 	}
 
 	return nil

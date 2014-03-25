@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
+	"github.com/trapped/gomaild/locker"
 	"github.com/trapped/gomaild/mailboxes"
 	. "github.com/trapped/gomaild/parsers/textual"
 	. "github.com/trapped/gomaild/processors/pop3/session"

@@ -53,7 +53,7 @@ func (p *POP3) Listen() {
 	cmdprocessor.Commands["uidl"] = uidl.Process
 	cmdprocessor.Commands["top"] = top.Process
 	cmdprocessor.Commands["apop"] = apop.Process
-	cmdprocessor.Commands["capa"] = apop.Process
+	cmdprocessor.Commands["capa"] = capa.Process
 
 	listener, err := net.Listen("tcp", "0.0.0.0:"+strconv.Itoa(p.Port))
 	if err != nil {

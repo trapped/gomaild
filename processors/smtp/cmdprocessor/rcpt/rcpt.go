@@ -1,4 +1,4 @@
-package mail
+package rcpt
 
 import (
 	. "github.com/trapped/gomaild/parsers/textual"
@@ -11,43 +11,42 @@ import (
 )
 
 func Process(session *Session, c Statement) Reply {
-	if session.State != IDENTIFICATED {
+	if session.State != RECAPITATION {
 		return Reply{Code: 503, Message: "wrong session state"}
 	}
 	if len(c.Arguments) < 2 {
 		return Reply{Code: 501, Message: "not enough arguments"}
 	}
 
-	log.Println("SMTP:", "MAIL command issued by", session.RemoteEP, "with", session.Identity)
+	log.Println("SMTP:", "RCPT command issued by", session.RemoteEP, "with", session.Identity)
 
 	tempdata := make(map[string]string, 0)
 
 	for _, v := range c.Arguments {
 		data := strings.Split(v, ":")
 		switch strings.ToLower(data[0]) {
-		case "from":
-			sender := strings.TrimSuffix(strings.TrimPrefix(data[1], "<"), ">")
+		case "to":
+			recipient := strings.TrimSuffix(strings.TrimPrefix(data[1], "<"), ">")
 			regex, err := regexp.Compile("(i?)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a0-9])?")
 			if err != nil {
 				return Reply{Code: 451, Message: "processing error while parsing the regex"}
 			}
-			if !regex.MatchString(sender) {
-				return Reply{Code: 553, Message: "invalid sender address"}
+			if !regex.MatchString(recipient) {
+				return Reply{Code: 553, Message: "invalid recipient address"}
 			}
-			if tempdata["sender"] != "" {
-				return Reply{Code: 501, Message: "sender address cannot be set twice"}
+			if tempdata["recipient"] != "" {
+				return Reply{Code: 501, Message: "recipient address cannot be set twice"}
 			}
-			tempdata["sender"] = sender
+			tempdata["recipient"] = recipient
 			break
 		}
 	}
 
-	if tempdata["sender"] == "" {
-		return Reply{Code: 501, Message: "sender not specified"}
+	if tempdata["recipient"] == "" {
+		return Reply{Code: 501, Message: "recipient not specified"}
 	}
 
-	session.State = RECAPITATION
-	session.Received = append(session.Received, &Message{Sender: tempdata["sender"]})
+	session.Received[len(session.Received)-1].(*Message).Recipients = append(session.Received[len(session.Received)-1].(Message).Recipients, tempdata["recipient"])
 
-	return Reply{Code: 250, Message: "sender ok"}
+	return Reply{Code: 250, Message: "recipient ok"}
 }

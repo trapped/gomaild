@@ -5,12 +5,12 @@ import (
 	"bufio"
 	"github.com/trapped/gomaild/locker"
 	"github.com/trapped/gomaild/processors/pop3/cmdprocessor"
+    "github.com/trapped/gomaild/mailboxes"
 	"github.com/trapped/gomaild/processors/pop3/sentences"
 	"github.com/trapped/gomaild/processors/pop3/session"
 	"log"
 	"net"
 	"os"
-	"path"
 	"strconv"
 	"time"
 )
@@ -67,7 +67,7 @@ func (c *Client) Process() {
 	//Set the POP3 session unique shared
 	processor.Session.Shared = "<" + strconv.Itoa(os.Getpid()) + "." + strconv.Itoa(time.Now().Nanosecond()) + ">"
 
-	//Send the POP3 session-start greeting eventually set in the "pop3.conf" configuration file and the shared.
+	//Send the POP3 session-start greeting eventually set in the "pop3.conf" configuration file.
 	err1 := c.Send("+OK " + sentences.StartGreeting() + " " + processor.Session.Shared)
 	//If an error occurs, log it and finalize the connection.
 	if err1 != nil {
@@ -102,7 +102,7 @@ func (c *Client) Process() {
 
 	//If the client opened a mailbox, unlock it using the locker.
 	if processor.Session.Authenticated {
-		locker.Unlock(path.Dir(os.Args[0]) + "/mailboxes/" + processor.Session.Username)
+		locker.Unlock(mailboxes.GetMailbox(processor.Session.Username))
 	}
 
 	//Set the Client's connection end time to time.Now().

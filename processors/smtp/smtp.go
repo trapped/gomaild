@@ -7,17 +7,17 @@ import (
 	"net"
 	"os"
 	"strconv"
-	////SMTP commands
-	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/list"
-	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/noop"
-	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/dele"
-	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/pass"
-	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/quit"
-	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/retr"
+	//SMTP commands
+	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/data"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/ehlo"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/helo"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/mail"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/noop"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/quit"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/rcpt"
 	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/rset"
-	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/stat"
 	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/user"
-	////Additional SMTP commands
+	//Additional SMTP commands
 	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/apop"
 	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/capa"
 	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/top"
@@ -39,14 +39,14 @@ func (p *SMTP) Listen() {
 	if p.Port == 0 {
 		p.Port = 25
 	}
-	////Initialize SMTP commands
-	//cmdprocessor.Commands["user"] = user.Process
-	//cmdprocessor.Commands["pass"] = pass.Process
-	//cmdprocessor.Commands["stat"] = stat.Process
-	//cmdprocessor.Commands["list"] = list.Process
-	//cmdprocessor.Commands["retr"] = retr.Process
-	//cmdprocessor.Commands["dele"] = dele.Process
-	//cmdprocessor.Commands["noop"] = noop.Process
+	//Initialize SMTP commands
+	cmdprocessor.Commands["helo"] = helo.Process
+	cmdprocessor.Commands["ehlo"] = ehlo.Process
+	cmdprocessor.Commands["quit"] = quit.Process
+	cmdprocessor.Commands["mail"] = mail.Process
+	cmdprocessor.Commands["rcpt"] = rcpt.Process
+	//cmdprocessor.Commands["data"] = data.Process
+	cmdprocessor.Commands["noop"] = noop.Process
 	//cmdprocessor.Commands["quit"] = quit.Process
 	//cmdprocessor.Commands["rset"] = rset.Process
 	////Additional (non-compulsory in RFC1725) commands

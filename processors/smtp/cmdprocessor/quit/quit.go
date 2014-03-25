@@ -1,76 +1,31 @@
 package quit
 
 import (
-	"errors"
-	"github.com/trapped/gomaild/mailboxes"
 	. "github.com/trapped/gomaild/parsers/textual"
-	"github.com/trapped/gomaild/processors/pop3/message"
-	"github.com/trapped/gomaild/processors/pop3/sentences"
-	. "github.com/trapped/gomaild/processors/pop3/session"
+	. "github.com/trapped/gomaild/processors/smtp/message"
+	. "github.com/trapped/gomaild/processors/smtp/reply"
+	"github.com/trapped/gomaild/processors/smtp/sentences"
+	. "github.com/trapped/gomaild/processors/smtp/session"
 	"log"
-	"strconv"
-	"strings"
 )
 
-func Process(session *Session, c Statement) (string, error) {
-	errorslice := []string{}
-	result := ""
-	goto checks
-
-returnerror:
-	if len(errorslice) != 0 {
-		session.Username = ""
-		session.Password = ""
-		result = strings.Join(errorslice, ", ")
-		return "", errors.New(result)
-	}
-
-checks:
+func Process(session *Session, c Statement) Reply {
 	if len(c.Arguments) != 1 {
-		errorslice = append(errorslice, "too many arguments")
+		return Reply{Code: 501, Message: "too many arguments"}
 	}
 
-	if len(errorslice) != 0 {
-		goto returnerror
-	}
+	log.Println("SMTP: QUIT command issued by", session.RemoteEP)
 
-	log.Println("POP3: QUIT command issued by", session.RemoteEP)
-
-	if session.State == TRANSACTION {
-		session.State = UPDATE
-	}
-
-	if session.State == UPDATE {
-		currentmessages := message.Index(session)
-
-		for i, _ := range session.Retrieved {
-			for f, _ := range currentmessages {
-				if session.Retrieved[i].(message.Message).ID == currentmessages[f].ID {
-					message.MoveMessage(session, currentmessages[f], "read")
-				}
-			}
-		}
-
-		for i, _ := range session.Deleted {
-			for f, _ := range currentmessages {
-				if session.Deleted[i].(message.Message).ID == currentmessages[f].ID {
-					message.MoveMessage(session, currentmessages[f], "deleted")
-				}
+	if len(session.Received) != 0 {
+		for _, v := range session.Received {
+			err := Store(session, v.(Message))
+			if err != nil {
+				log.Println("SMTP:", "Error storing message:", err)
 			}
 		}
 	}
 
 	session.Quitted = true
 
-	count, _ := mailboxes.Stat(session.Username, false)
-
-	ex := sentences.EndGreeting()
-	if session.Authenticated {
-		if ex != "" {
-			ex += " "
-		}
-		ex += "(" + strconv.Itoa(count) + " messages left)"
-	}
-
-	return ex, nil
+	return Reply{Code: 221, Message: sentences.EndGreeting()}
 }

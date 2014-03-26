@@ -8,7 +8,7 @@ import (
 	"os"
 	"strconv"
 	//SMTP commands
-	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/data"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/data"
 	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/ehlo"
 	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/helo"
 	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/mail"
@@ -45,9 +45,8 @@ func (p *SMTP) Listen() {
 	cmdprocessor.Commands["quit"] = quit.Process
 	cmdprocessor.Commands["mail"] = mail.Process
 	cmdprocessor.Commands["rcpt"] = rcpt.Process
-	//cmdprocessor.Commands["data"] = data.Process
+	cmdprocessor.Commands["data"] = data.Process
 	cmdprocessor.Commands["noop"] = noop.Process
-	//cmdprocessor.Commands["quit"] = quit.Process
 	//cmdprocessor.Commands["rset"] = rset.Process
 	////Additional (non-compulsory in RFC1725) commands
 	//cmdprocessor.Commands["uidl"] = uidl.Process

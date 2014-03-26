@@ -15,7 +15,8 @@ var (
 
 //Processor is a struct to provide a throw-away command processor and session for SMTP.
 type Processor struct {
-	Session *Session
+	Session     *Session
+	LastCommand string
 }
 
 //Process processes a SMTP command and returns a result.
@@ -24,8 +25,8 @@ func (p *Processor) Process(s string) string {
 	parser := textual.Parser{
 		Prefix:             "",
 		Suffix:             "",
-		OpenBrackets:       false,
-		Brackets:           "",
+		OpenBrackets:       true,
+		Brackets:           []byte{'<', '>'},
 		Trim:               true,
 		ArgumentSeparators: []byte{' '},
 	}
@@ -33,8 +34,13 @@ func (p *Processor) Process(s string) string {
 	//Parse the command with the parser.
 	z := parser.Parse(s)
 
+	if p.Session.State == COMPOSITION {
+		z.Name = p.LastCommand
+	}
+
 	//Run the processor for the command issued by the client (if it exists) and return the result with the correct SMTP result prefix.
 	if _, exists := Commands[strings.ToLower(z.Name)]; exists {
+		p.LastCommand = z.Name
 		res := Commands[strings.ToLower(z.Name)](p.Session, z)
 		if res.Code == 0 {
 			return res.Message

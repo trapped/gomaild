@@ -17,7 +17,8 @@ func Process(session *Session, c Statement) (string, error) {
 	capabilities += "PIPELINING\r\n"
 	capabilities += "EXPIRE NEVER\r\n"
 	capabilities += "RESP-CODES\r\n"
-	capabilities += "IMPLEMENTATION gomaild_<http://github.com/trapped/gomaild>"
+	capabilities += "IMPLEMENTATION gomaild_<http://github.com/trapped/gomaild>\r\n"
+	capabilities += "."
 
 	return capabilities, nil
 }

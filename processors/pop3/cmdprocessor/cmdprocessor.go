@@ -24,7 +24,7 @@ func (p *Processor) Process(s string) string {
 		Prefix:             "",
 		Suffix:             "",
 		OpenBrackets:       false,
-		Brackets:           "",
+		Brackets:           []byte{},
 		Trim:               true,
 		ArgumentSeparators: []byte{' '},
 	}

@@ -19,7 +19,7 @@ func Process(session *Session, c Statement) Reply {
 
 	log.Println("SMTP:", "HELO command issued by", session.RemoteEP, "with", session.Identity)
 
-	greeting := "250 greetings, " + session.Identity + "\r\n"
+	greeting := "250 greetings, " + session.Identity
 
 	session.State = IDENTIFICATED
 

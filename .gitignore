@@ -27,3 +27,6 @@ _testmain.go
 
 # Project specific executable
 gomaild
+
+# Vim swap files
+*.swp

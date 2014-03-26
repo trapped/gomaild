@@ -46,7 +46,7 @@ func Process(session *Session, c Statement) Reply {
 		return Reply{Code: 501, Message: "recipient not specified"}
 	}
 
-	session.Received[len(session.Received)-1].(*Message).Recipients = append(session.Received[len(session.Received)-1].(Message).Recipients, tempdata["recipient"])
+	session.Received[len(session.Received)-1].(*Message).Recipients = append(session.Received[len(session.Received)-1].(*Message).Recipients, tempdata["recipient"])
 
 	return Reply{Code: 250, Message: "recipient ok"}
 }

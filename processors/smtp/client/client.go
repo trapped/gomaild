@@ -6,7 +6,7 @@ import (
 	//"github.com/trapped/gomaild/locker"
 	"github.com/trapped/gomaild/processors/smtp/cmdprocessor"
 	"github.com/trapped/gomaild/processors/smtp/sentences"
-	"github.com/trapped/gomaild/processors/smtp/session"
+	. "github.com/trapped/gomaild/processors/smtp/session"
 	"log"
 	"net"
 	"time"
@@ -58,7 +58,7 @@ func (c *Client) Process() {
 	bufin := bufio.NewReader(c.Conn)
 	//Set up a command processor.
 	processor := cmdprocessor.Processor{
-		Session: &session.Session{RemoteEP: c.RemoteEP()},
+		Session: &Session{RemoteEP: c.RemoteEP()},
 	}
 
 	//Set the SMTP session unique shared
@@ -88,8 +88,13 @@ func (c *Client) Process() {
 			break
 		}
 
-		//Process the last command received from the client using cmdprocessor.Process() and send the result to the client.
-		err2b := c.Send(processor.Process(line))
+		//Process the last command received from the client using cmdprocessor.Process() and send the result to the client. If the processor is waiting for a multiline message, just wait until it exits the COMPOSITION state.
+		oldstate := processor.Session.State
+		result := processor.Process(line)
+		if processor.Session.State == COMPOSITION && oldstate == COMPOSITION {
+			continue
+		}
+		err2b := c.Send(result)
 		//If an error occurs, log it and finalize the connection.
 		if err2b != nil {
 			log.Println(err2b)

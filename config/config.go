@@ -14,10 +14,9 @@ var Settings map[string]map[string][]interface{} = make(map[string]map[string][]
 
 var parser = textual.Parser{
 	OpenBrackets:       true,
-	Brackets:           "``",
+	Brackets:           []byte{'`'},
 	Trim:               true,
-	IgnoreEmpty:        true,
-	ArgumentSeparators: []byte{' ', '\n'},
+	ArgumentSeparators: []byte{' ', '\n', '\r'},
 }
 
 func Read() {

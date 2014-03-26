@@ -1,6 +1,8 @@
 package textual
 
 import (
+	"log"
+	"math"
 	"strings"
 )
 
@@ -8,11 +10,9 @@ type Parser struct {
 	Prefix             string
 	Suffix             string
 	OpenBrackets       bool
-	Brackets           string
+	Brackets           []byte
 	ArgumentSeparators []byte
-	MaxCmdLength       int
 	Trim               bool
-	IgnoreEmpty        bool
 }
 
 type Statement struct {
@@ -22,72 +22,61 @@ type Statement struct {
 }
 
 func (p *Parser) Parse(s string) Statement {
-	cmd := Statement{
-		Raw: s,
-	}
+	cmd := Statement{Raw: s}
+
 	if p.Trim {
 		s = strings.TrimSpace(s)
 	}
-	if p.Prefix != "" && strings.HasPrefix(s, p.Prefix) {
-		s = strings.TrimPrefix(s, p.Prefix)
-	}
-	if p.Suffix != "" && strings.HasSuffix(s, p.Suffix) {
-		s = strings.TrimSuffix(s, p.Suffix)
-	}
-	if p.Brackets != "" {
-		arg := ""
-		inbrackets := false
-		considerwhites := false
-		for i := 0; i < len(s); i++ {
-			z := s[i]
-			if z == p.Brackets[0] && inbrackets == false {
-				inbrackets = true
-				considerwhites = true
-				if !p.OpenBrackets {
-					arg += string(z)
-				}
-			} else if z == p.Brackets[1] && inbrackets == true {
-				inbrackets = false
-				considerwhites = false
-				if !p.OpenBrackets {
-					arg += string(z)
-				}
-			} else {
-				if !inbrackets {
-					if !inarray(p.ArgumentSeparators, z) {
-						arg += string(z)
-					} else {
-						if (strings.TrimSpace(arg) != "" || !p.IgnoreEmpty || considerwhites) && arg != "" {
-							cmd.Arguments = append(cmd.Arguments, arg)
-							arg = ""
-						}
-					}
-				} else {
-					arg += string(z)
-				}
-			}
-			if i == len(s)-1 {
-				if (strings.TrimSpace(arg) != "" || !p.IgnoreEmpty || considerwhites) && arg != "" {
-					cmd.Arguments = append(cmd.Arguments, arg)
-					considerwhites = false
-				}
-			}
+
+	s = strings.TrimPrefix(s, p.Prefix)
+	s = strings.TrimSuffix(s, p.Suffix)
+
+	temparg := ""
+	bracksopen := false
+
+	for i := 0; i < len(s); i++ {
+		//if (NOT IN ArgumentSeparators OR bracksopen) AND (NOT IN Brackets OR NOT OpenBrackets)
+		if (!inarray(p.ArgumentSeparators, s[i]) || bracksopen) && (!inarray(p.Brackets, s[i]) || !p.OpenBrackets) {
+			temparg += string(s[i])
 		}
-	} else {
-		cmd.Arguments = strings.Split(s, string(p.ArgumentSeparators[0]))
-		if p.IgnoreEmpty {
-			for i, v := range cmd.Arguments {
-				if strings.TrimSpace(v) == "" {
-					cmd.Arguments = append(cmd.Arguments[:i], cmd.Arguments[i+1:]...)
-				}
+		if inarray(p.ArgumentSeparators, s[i]) && !bracksopen { //if (IN ArgumentSeparators) AND (NOT bracksopen)
+			if temparg != "" {
+				cmd.Arguments = append(cmd.Arguments, temparg)
+				temparg = ""
 			}
+			continue
+		} else if inarray(p.Brackets[:int(math.Ceil(float64(len(p.Brackets))/2))], s[i]) && !bracksopen { //if (IN FIRST HALF OF Brackets) AND (NOT bracksopen)
+			bracksopen = true
+			if temparg != "" {
+				cmd.Arguments = append(cmd.Arguments, temparg)
+				temparg = ""
+			}
+			continue
+		} else if inarray(p.Brackets[int(math.Floor(float64(len(p.Brackets))/2)):], s[i]) && bracksopen { //if (IN SECOND HALF OF Brackets) AND (bracksopen)
+			bracksopen = false
+			if temparg != "" {
+				cmd.Arguments = append(cmd.Arguments, temparg)
+				temparg = ""
+			}
+			continue
 		}
 	}
-	if p.MaxCmdLength > 0 {
-		cmd.Name = s[0:p.MaxCmdLength]
-	} else {
+	if temparg != "" {
+		cmd.Arguments = append(cmd.Arguments, temparg)
+	}
+
+	if len(cmd.Arguments) > 0 {
 		cmd.Name = cmd.Arguments[0]
 	}
+
+	d := func(f Statement) string {
+		result := ""
+		for i := 0; i < len(f.Arguments); i++ {
+			result += "<" + f.Arguments[i] + ">"
+		}
+		return result
+	}(cmd)
+	log.Println(d)
 
 	return cmd
 }

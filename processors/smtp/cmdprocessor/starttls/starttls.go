@@ -8,6 +8,7 @@ import (
 )
 
 func Process(session *Session, c Statement) Reply {
+	log.Println()
 	if session.InTLS {
 		return Reply{Code: 454, Message: "already in TLS"}
 	}

@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	//"strconv"
 	"strings"
 )
 
@@ -71,3 +72,23 @@ func ParseConfig(s string) {
 		}
 	}
 }
+
+/*
+func Bool(confile string, s string) bool {
+	if Settings[confile] == nil || Settings[confile][s] == nil {
+		return false
+	}
+	value, err := strconv.ParseBool(Settings[confile][s].(textual.Statement).Arguments[1])
+	if err != nil {
+		return false
+	}
+	return value
+}
+
+func Statement(confile string, s string) textual.Statement {
+	if Settings[confile] == nil || Settings[confile][s] == nil {
+		return false
+	}
+	return Settings[confile][s].(textual.Statement)
+}
+*/

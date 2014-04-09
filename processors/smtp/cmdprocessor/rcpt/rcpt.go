@@ -22,11 +22,10 @@ func Process(session *Session, c Statement) Reply {
 
 	tempdata := make(map[string]string, 0)
 
-	for _, v := range c.Arguments {
-		data := strings.Split(v, ":")
-		switch strings.ToLower(data[0]) {
+	for i, v := range c.Arguments {
+		switch strings.ToLower(strings.TrimSuffix(v, ":")) {
 		case "to":
-			recipient := strings.TrimSuffix(strings.TrimPrefix(data[1], "<"), ">")
+			recipient := c.Arguments[i+1]
 			regex, err := regexp.Compile("(i?)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a0-9])?")
 			if err != nil {
 				return Reply{Code: 451, Message: "processing error while parsing the regex"}

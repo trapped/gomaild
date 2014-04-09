@@ -15,13 +15,7 @@ import (
 	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/noop"
 	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/quit"
 	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/rcpt"
-	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/rset"
-	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/user"
-	//Additional SMTP commands
-	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/apop"
-	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/capa"
-	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/top"
-	//"github.com/trapped/gomaild/processors/smtp/cmdprocessor/uidl"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/rset"
 )
 
 type SMTP struct {
@@ -47,12 +41,7 @@ func (p *SMTP) Listen() {
 	cmdprocessor.Commands["rcpt"] = rcpt.Process
 	cmdprocessor.Commands["data"] = data.Process
 	cmdprocessor.Commands["noop"] = noop.Process
-	//cmdprocessor.Commands["rset"] = rset.Process
-	////Additional (non-compulsory in RFC1725) commands
-	//cmdprocessor.Commands["uidl"] = uidl.Process
-	//cmdprocessor.Commands["top"] = top.Process
-	//cmdprocessor.Commands["apop"] = apop.Process
-	//cmdprocessor.Commands["capa"] = apop.Process
+	cmdprocessor.Commands["rset"] = rset.Process
 
 	listener, err := net.Listen("tcp", "0.0.0.0:"+strconv.Itoa(p.Port))
 	if err != nil {

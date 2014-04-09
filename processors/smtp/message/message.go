@@ -4,10 +4,12 @@ import (
 	"github.com/trapped/gomaild/locker"
 	"github.com/trapped/gomaild/mailboxes"
 	. "github.com/trapped/gomaild/processors/smtp/session"
+	rfc "github.com/trapped/rfc2822"
 	"io/ioutil"
+	"log"
 	"os"
 	"strconv"
-	"strings"
+	"time"
 )
 
 type Messages []Message
@@ -22,86 +24,18 @@ type Message struct {
 	Text         string
 }
 
-func Headers(m Message) (string, error) {
-	file := []byte{}
-	if m.Text == "" {
-		afile, err := ioutil.ReadFile(m.Path)
-		if err != nil {
-			return "", err
-		}
-		file = afile
-	} else {
-		file = []byte(m.Text)
-	}
-	pos, err := HeadersLimit(m)
-	if err != nil {
-		return "", err
-	}
-	lines := strings.Split(string(file), "\r\n")
-	headers := []string{""}
-	if pos > 0 {
-		headers = lines[:pos]
-	}
-	return strings.Join(headers, "\r\n"), nil
-}
-
-func HeadersLimit(m Message) (int, error) {
-	file := []byte{}
-	if m.Text == "" {
-		afile, err := ioutil.ReadFile(m.Path)
-		if err != nil {
-			return 0, err
-		}
-		file = afile
-	} else {
-		file = []byte(m.Text)
-	}
-	lines := strings.Split(string(file), "\r\n")
-	for i, v := range lines {
-		if v == "" {
-			return i, nil
-		}
-	}
-	return 0, nil
-}
-
-func Body(m Message) (string, error) {
-	file := []byte{}
-	if m.Text == "" {
-		afile, err := ioutil.ReadFile(m.Path)
-		if err != nil {
-			return "", err
-		}
-		file = afile
-	} else {
-		file = []byte(m.Text)
-	}
-	pos, err := HeadersLimit(m)
-	if err != nil {
-		return "", err
-	}
-	lines := strings.Split(string(file), "\r\n")
-	body := []string{""}
-	if pos <= len(lines)-1 {
-		body = lines[pos+1:]
-	}
-	return strings.Join(body, "\r\n"), nil
-}
-
 func Store(session *Session, m Message) error {
-	hders, err := Headers(m)
+	log.Println("SMTP/message:", "Storing message for", m.Recipients, "by", m.Sender)
+	msg, err := rfc.ReadString(m.Text)
 	if err != nil {
-		return err
+		log.Println("SMTP/message:", "Error parsing message:", err)
 	}
-	headers := strings.Split(hders, "\r\n")
-	if m.RemoteDomain != "" {
-		headers = append(headers, "X-Received-From: "+m.RemoteDomain)
-	}
+	msg.AddMultiHeader("Received", []string{"from " + m.RemoteDomain + "(" + session.RemoteEP + ")" + ";", time.Now().Format(time.RFC1123Z)})
 	if m.Sender != "" {
-		headers = append(headers, "X-Sender: <"+m.Sender+">")
+		msg.AddHeader("Return-Path", "<"+m.Sender+">")
 	}
 	if len(m.Recipients) != 0 {
-		headers = append(headers, "X-Recipient: "+func(a []string) string {
+		msg.AddHeader("X-Recipients", func(a []string) string {
 			result := ""
 			for _, v := range a {
 				if result != "" {
@@ -112,17 +46,17 @@ func Store(session *Session, m Message) error {
 			return result
 		}(m.Recipients))
 	}
-	mheaders := strings.Join(headers, "\r\n")
-	mbody, err := Body(m)
-	if err != nil {
-		return err
-	}
-	newfull := mheaders + "\r\n" + mbody
+
+	newfull := msg.Text()
 
 	for _, v := range m.Recipients {
+		mailboxes.CreateIfNull(v)
 		locker.MLock(mailboxes.GetMailbox(v))
 		ustatc, _ := mailboxes.Stat(v, true)
-		ioutil.WriteFile(mailboxes.GetMailbox(v)+"/unread/"+strconv.Itoa(ustatc)+".eml", []byte(newfull), 0777)
+		err := ioutil.WriteFile(mailboxes.GetMailbox(v)+"/unread/"+strconv.Itoa(ustatc)+".eml", []byte(newfull), 0777)
+		if err != nil {
+			return err
+		}
 		locker.MUnlock(mailboxes.GetMailbox(v))
 	}
 

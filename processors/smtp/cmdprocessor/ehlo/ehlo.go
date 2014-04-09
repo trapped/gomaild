@@ -21,9 +21,12 @@ func Process(session *Session, c Statement) Reply {
 
 	capabilities := "250-greetings, " + session.Identity + "\r\n"
 	capabilities += "250-8BITMIME\r\n"
+	/*if !session.InTLS {
+	    capabilities += "250-STARTTLS\r\n"
+	}*/
 	capabilities += "250 PIPELINING"
 
-    session.State = IDENTIFICATED
+	session.State = IDENTIFICATED
 
 	return Reply{Message: capabilities}
 }

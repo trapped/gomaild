@@ -13,7 +13,7 @@ var (
 type Session struct {
 	RemoteEP string
 	State    S_State
-	InSSL    bool
+	InTLS    bool
 	Identity string
 	Secret   string
 	Quitted  bool

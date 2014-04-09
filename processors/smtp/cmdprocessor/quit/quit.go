@@ -18,7 +18,7 @@ func Process(session *Session, c Statement) Reply {
 
 	if len(session.Received) != 0 {
 		for _, v := range session.Received {
-			err := Store(session, v.(Message))
+			err := Store(session, *v.(*Message))
 			if err != nil {
 				log.Println("SMTP:", "Error storing message:", err)
 			}

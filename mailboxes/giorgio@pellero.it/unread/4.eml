@@ -1,0 +1,13 @@
+From: Giorgio Pellero <giorgio@pellero.it>
+To: Giorgio Pellero <giorgio@pellero.it>
+Received: from pellero.it (EHLO pellero.it) [::1]
+        by pellero.it;
+        Mon, Jan 1 2014 00:00:00 -0700
+Subject: example mail
+Return-Path: <giorgio@pellero.it>
+X-Recipients: <giorgio@pellero.it>
+
+This is an example e-email sent through the gomail SMTP server.
+It as some headers, some body text, and a footer.
+
+Bye!

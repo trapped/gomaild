@@ -1,5 +1,6 @@
 all:
+	go get -u ./...
 	go build -a -v -race
 
 clean:
-	rm ./gomaild
+	go clean

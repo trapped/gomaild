@@ -6,9 +6,13 @@ import (
 	"github.com/trapped/gomaild/processors/pop3"
 	"github.com/trapped/gomaild/processors/smtp"
 	"log"
+	"runtime"
 )
 
 func main() {
+	//Set max number of processors used to the number of CPUs
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	config.Read()
 	log.Println("gomaild: Starting gomaild")
 	//Start POP3 server

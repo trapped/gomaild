@@ -3,32 +3,18 @@ package mailboxes
 import (
 	"errors"
 	"github.com/trapped/gomaild/config"
-	. "github.com/trapped/gomaild/parsers/textual"
 	"log"
 	"os"
 	"path"
 	"path/filepath"
 )
 
-func GetUser(s string) (Statement, error) {
+func GetUser(s string) (string, error) {
 	log.Println("package/mailboxes:", "Queried existence of user <"+s+">")
-	if config.Settings["gomaild"] != nil {
-		for _, v := range config.Settings["gomaild"]["user"] {
-			z := v.(Statement)
-			if z.Arguments[1] == s {
-				return z, nil
-			}
-		}
+	if value, exists := config.Configuration.Accounts[s]; exists {
+		return value, nil
 	}
-	if config.Settings["pop3"] != nil {
-		for _, v := range config.Settings["pop3"]["user"] {
-			z := v.(Statement)
-			if z.Arguments[1] == s {
-				return z, nil
-			}
-		}
-	}
-	return Statement{}, errors.New("no such user")
+	return "", errors.New("no such user")
 }
 
 func GetMailbox(user string) string {

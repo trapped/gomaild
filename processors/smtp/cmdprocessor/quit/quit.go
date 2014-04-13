@@ -1,10 +1,10 @@
 package quit
 
 import (
+	"github.com/trapped/gomaild/config"
 	. "github.com/trapped/gomaild/parsers/textual"
 	. "github.com/trapped/gomaild/processors/smtp/message"
 	. "github.com/trapped/gomaild/processors/smtp/reply"
-	"github.com/trapped/gomaild/processors/smtp/sentences"
 	. "github.com/trapped/gomaild/processors/smtp/session"
 	"log"
 )
@@ -27,5 +27,5 @@ func Process(session *Session, c Statement) Reply {
 
 	session.Quitted = true
 
-	return Reply{Code: 221, Message: sentences.EndGreeting()}
+	return Reply{Code: 221, Message: config.Configuration.SMTP.EndGreeting}
 }

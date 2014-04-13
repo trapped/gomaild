@@ -3,10 +3,10 @@ package client
 
 import (
 	"bufio"
+	"github.com/trapped/gomaild/config"
 	"github.com/trapped/gomaild/locker"
+	"github.com/trapped/gomaild/mailboxes"
 	"github.com/trapped/gomaild/processors/pop3/cmdprocessor"
-    "github.com/trapped/gomaild/mailboxes"
-	"github.com/trapped/gomaild/processors/pop3/sentences"
 	"github.com/trapped/gomaild/processors/pop3/session"
 	"log"
 	"net"
@@ -68,7 +68,7 @@ func (c *Client) Process() {
 	processor.Session.Shared = "<" + strconv.Itoa(os.Getpid()) + "." + strconv.Itoa(time.Now().Nanosecond()) + ">"
 
 	//Send the POP3 session-start greeting eventually set in the "pop3.conf" configuration file.
-	err1 := c.Send("+OK " + sentences.StartGreeting() + " " + processor.Session.Shared)
+	err1 := c.Send("+OK " + config.Configuration.POP3.StartGreeting + " " + processor.Session.Shared)
 	//If an error occurs, log it and finalize the connection.
 	if err1 != nil {
 		log.Println("POP3:", err1)

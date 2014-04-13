@@ -19,6 +19,14 @@ func MoveMessage(session *Session, m Message, destfolder string) error {
 	return nil
 }
 
+func DeleteMessage(m Message) error {
+	err := os.Remove(m.Path)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 type Messages []Message
 
 type Message struct {

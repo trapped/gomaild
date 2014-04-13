@@ -24,6 +24,10 @@ returnerror:
 	}
 
 checks:
+	if !config.Configuration.POP3.EnableUSER {
+		errorslice = append(errorslice, "command not available")
+		goto returnerror
+	}
 	if session.State != AUTHORIZATION {
 		errorslice = append(errorslice, "wrong session state")
 	}
@@ -46,7 +50,7 @@ checks:
 
 	log.Println("POP3:", "USER command issued by", session.RemoteEP, "with", c.Arguments[1])
 
-	if config.Settings["pop3"]["secure_user"] == nil || len(config.Settings["pop3"]["secure_user"]) == 0 {
+	if !config.Configuration.POP3.SecureUSER {
 		_, erra := mailboxes.GetUser(c.Arguments[1])
 		if erra != nil {
 			errorslice = append(errorslice, "no such user")

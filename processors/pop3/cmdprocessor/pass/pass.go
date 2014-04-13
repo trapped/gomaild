@@ -50,13 +50,13 @@ checks:
 
 	log.Println("POP3:", "PASS command issued by", session.RemoteEP, "with", session.Username, "and `"+session.Password+"`")
 
-	user, erra := mailboxes.GetUser(session.Username)
-	if erra != nil {
+	password, exists := mailboxes.GetUser(session.Username)
+	if exists != nil {
 		errorslice = append(errorslice, "no such username/password combination")
 		goto returnerror
 	}
 
-	if user.Arguments[3] != c.Arguments[1] {
+	if password != c.Arguments[1] {
 		errorslice = append(errorslice, "no such username/password combination")
 		goto returnerror
 	}

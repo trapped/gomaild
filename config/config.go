@@ -1,23 +1,51 @@
 package config
 
 import (
-	"github.com/trapped/gomaild/parsers/textual"
+	jconf "github.com/trapped/gomaild/parsers/config"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
 	"path/filepath"
-	//"strconv"
 	"strings"
 )
 
-var Settings map[string]map[string][]interface{} = make(map[string]map[string][]interface{}, 0)
+var Configuration Settings
 
-var parser = textual.Parser{
-	OpenBrackets:       true,
-	Brackets:           []byte{'`'},
-	Trim:               true,
-	ArgumentSeparators: []byte{' ', '\n', '\r'},
+type Settings struct {
+	Debug    bool              `json:"debug"`
+	Accounts map[string]string `json:"Accounts`
+	Aliases  map[string]string `json:"Aliases"`
+	POP3     POP3sett          `json:"POP3"`
+	SMTP     SMTPsett          `json:"SMTP"`
+	TLS      TLSsett           `json:"TLS"`
+}
+
+type POP3sett struct {
+	StartGreeting string `json:"start_greeting"`
+	EndGreeting   string `json:"end_greeting"`
+	EnableUSER    bool   `json:"enable_user_cmd"`
+	SecureUSER    bool   `json:"secure_user_cmd"`
+	FakeDELE      bool   `json:"fake_dele_cmd"`
+}
+
+type SMTPsett struct {
+	StartGreeting           string `json:"start_greeting"`
+	EndGreeting             string `json:"end_greeting"`
+	QueuedMessage           string `json:"queued_message"`
+	HelloMessage            string `json:"helo_message,ehlo_message"`
+	SenderOkMessage         string `json:"sender_ok_message"`
+	SenderInvalidMessage    string `json:"sender_invalid_message"`
+	RecipientOkMessage      string `json:"recipient_ok_message"`
+	RecipientInvalidMessage string `json:"recipient_invalid_message"`
+	DATAStartMessage        string `json:"data_start_message"`
+	Timeout                 uint   `json:"timeout"`
+	TimeoutMessage          string `json:"timeout_message"`
+}
+
+type TLSsett struct {
+	CertificateFile    string `json:"certificate_file"`
+	CertificateKeyFile string `json:"certificate_key_file"`
 }
 
 func Read() {
@@ -39,56 +67,11 @@ func ParseConfig(s string) {
 	log.Println("Configuration: Parsing file", basename)
 	file, err := ioutil.ReadFile(s)
 	if err != nil {
-		log.Println("Configuration: Error reading config file", basename)
+		log.Println("Configuration: Error reading config file", basename+":", err)
 		return
 	}
-	filetext := string(file)
-	{
-		intocommentblock := false
-		statement := ""
-		for i := 0; i < len(string(file)); i++ {
-			if filetext[i] == '#' {
-				if intocommentblock {
-					intocommentblock = false
-				} else {
-					intocommentblock = true
-				}
-			} else {
-				if !intocommentblock {
-					if filetext[i] != ';' {
-						statement += string(filetext[i])
-					} else {
-						if strings.TrimSpace(statement) != "" {
-							parsedstatement := parser.Parse(statement)
-							if Settings[basename] == nil {
-								Settings[basename] = make(map[string][]interface{})
-							}
-							Settings[basename][parsedstatement.Name] = append(Settings[basename][parsedstatement.Name], parsedstatement)
-							statement = ""
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-/*
-func Bool(confile string, s string) bool {
-	if Settings[confile] == nil || Settings[confile][s] == nil {
-		return false
-	}
-	value, err := strconv.ParseBool(Settings[confile][s].(textual.Statement).Arguments[1])
+	err = jconf.Parse(string(file), &Configuration)
 	if err != nil {
-		return false
+		log.Println("Configuration: Error parsing config file", basename+":", err)
 	}
-	return value
 }
-
-func Statement(confile string, s string) textual.Statement {
-	if Settings[confile] == nil || Settings[confile][s] == nil {
-		return false
-	}
-	return Settings[confile][s].(textual.Statement)
-}
-*/

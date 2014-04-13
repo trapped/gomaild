@@ -1,6 +1,7 @@
 package data
 
 import (
+	"github.com/trapped/gomaild/config"
 	. "github.com/trapped/gomaild/parsers/textual"
 	. "github.com/trapped/gomaild/processors/smtp/message"
 	. "github.com/trapped/gomaild/processors/smtp/reply"
@@ -20,12 +21,12 @@ func Process(session *Session, c Statement) Reply {
 
 	if session.State == RECAPITATION {
 		session.State = COMPOSITION
-		return Reply{Code: 354, Message: "start mail input, end with <CRLF.CRLF>"}
+		return Reply{Code: 354, Message: config.Configuration.SMTP.DATAStartMessage}
 	}
 
 	if c.Raw == ".\r\n" {
 		session.State = IDENTIFICATED
-		return Reply{Code: 250, Message: "message accepted and queued"}
+		return Reply{Code: 250, Message: config.Configuration.SMTP.QueuedMessage}
 	}
 
 	session.Received[len(session.Received)-1].(*Message).Text += c.Raw

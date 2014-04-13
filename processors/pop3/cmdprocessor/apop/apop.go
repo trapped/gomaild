@@ -52,14 +52,14 @@ checks:
 
 	log.Println("POP3:", "APOP command issued by", session.RemoteEP, "with", c.Arguments[1])
 
-	user, erra := mailboxes.GetUser(c.Arguments[1])
-	if erra != nil {
+	password, exists := mailboxes.GetUser(c.Arguments[1])
+	if exists != nil {
 		errorslice = append(errorslice, "no such user")
 		goto returnerror
 	}
 
 	hash := md5.New()
-	hash.Write([]byte(session.Shared + user.Arguments[3]))
+	hash.Write([]byte(session.Shared + password))
 	digest := hex.EncodeToString(hash.Sum(nil))
 
 	if c.Arguments[2] == digest {

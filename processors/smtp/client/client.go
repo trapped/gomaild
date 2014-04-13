@@ -4,8 +4,8 @@ package client
 import (
 	"bufio"
 	//"github.com/trapped/gomaild/locker"
+	"github.com/trapped/gomaild/config"
 	"github.com/trapped/gomaild/processors/smtp/cmdprocessor"
-	"github.com/trapped/gomaild/processors/smtp/sentences"
 	. "github.com/trapped/gomaild/processors/smtp/session"
 	"log"
 	"net"
@@ -14,20 +14,22 @@ import (
 
 //Client is the structure used to store some useful parts of the SMTP clients.
 type Client struct {
-	Parent   *net.Listener //The client's parent listener.
-	Conn     net.Conn      //The client's network connection.
-	Start    time.Time     //The connection start time.
-	End      time.Time     //The connection end time.
-	KeepOpen bool          //Whether to keep Process() looping or not.
+	Parent       *net.Listener //The client's parent listener.
+	Conn         net.Conn      //The client's network connection.
+	Start        time.Time     //The connection start time.
+	End          time.Time     //The connection end time.
+	KeepOpen     bool          //Whether to keep Process() looping or not.
+	TimeoutTimer *time.Timer   //Timer to check whether the connection times out.
 }
 
 //MakeClient creates a client, given a parent network listener and a network connection.
 func MakeClient(parent *net.Listener, conn net.Conn) *Client {
 	return &Client{
-		Parent:   parent,
-		Conn:     conn,
-		Start:    time.Now(),
-		KeepOpen: true,
+		Parent:       parent,
+		Conn:         conn,
+		Start:        time.Now(),
+		KeepOpen:     true,
+		TimeoutTimer: time.NewTimer(time.Duration(config.Configuration.SMTP.Timeout) * time.Second),
 	}
 }
 
@@ -65,14 +67,16 @@ func (c *Client) Process() {
 	//processor.Session.Shared = "<" + strconv.Itoa(os.Getpid()) + "." + strconv.Itoa(time.Now().Nanosecond()) + ">"
 
 	//Send the SMTP session-start greeting eventually set in the "smtp.conf" configuration file and the shared.
-	err1 := c.Send("220 " + sentences.StartGreeting() /* + " " + processor.Session.Shared*/)
+	err1 := c.Send("220 " + config.Configuration.SMTP.StartGreeting /* + " " + processor.Session.Shared*/)
 	//If an error occurs, log it and finalize the connection.
 	if err1 != nil {
 		log.Println("SMTP:", err1)
 		return
 	}
 
-	//Stop looping if the KeepOpen property of the client becomes false.
+	//Start the goroutine to check for timeout
+	go c.Timeout()
+
 	for c.KeepOpen {
 		//Stop looping if the client quits its SMTP session.
 		if processor.Session.Quitted {
@@ -87,6 +91,9 @@ func (c *Client) Process() {
 			log.Println(err2a)
 			break
 		}
+
+		//Reset the timeout timer
+		c.TimeoutTimer.Reset(time.Duration(config.Configuration.SMTP.Timeout) * time.Second)
 
 		//Process the last command received from the client using cmdprocessor.Process() and send the result to the client. If the processor is waiting for a multiline message, just wait until it exits the COMPOSITION state.
 		oldstate := processor.Session.State
@@ -112,4 +119,22 @@ func (c *Client) Process() {
 
 	//Log the connection ending, with the remote endpoint.
 	log.Println("SMTP: Disconnecting", c.RemoteEP())
+}
+
+//Has to be started as a goroutine since it loops until timeout or connection end
+func (c *Client) Timeout() {
+	for c.KeepOpen {
+		select {
+		case x := <-c.TimeoutTimer.C:
+			log.Println("SMTP:", "Timeout for", c.RemoteEP()+":", x)
+			c.End = time.Now()
+			c.Send("421 " + config.Configuration.SMTP.TimeoutMessage)
+			c.KeepOpen = false
+			err := c.Conn.Close()
+			if err != nil {
+				log.Println("SMTP:", "Error closing the connection for", c.RemoteEP()+":", err)
+			}
+			return
+		}
+	}
 }

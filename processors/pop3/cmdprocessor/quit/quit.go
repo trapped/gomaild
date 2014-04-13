@@ -2,10 +2,10 @@ package quit
 
 import (
 	"errors"
+	"github.com/trapped/gomaild/config"
 	"github.com/trapped/gomaild/mailboxes"
 	. "github.com/trapped/gomaild/parsers/textual"
 	"github.com/trapped/gomaild/processors/pop3/message"
-	"github.com/trapped/gomaild/processors/pop3/sentences"
 	. "github.com/trapped/gomaild/processors/pop3/session"
 	"log"
 	"strconv"
@@ -54,7 +54,17 @@ checks:
 		for i, _ := range session.Deleted {
 			for f, _ := range currentmessages {
 				if session.Deleted[i].(message.Message).ID == currentmessages[f].ID {
-					message.MoveMessage(session, currentmessages[f], "deleted")
+					if config.Configuration.POP3.FakeDELE {
+						err := message.MoveMessage(session, currentmessages[f], "deleted")
+						if err != nil {
+							log.Println("POP3:", "Error fake-deleting message", err)
+						}
+					} else {
+						err := message.DeleteMessage(currentmessages[f])
+						if err != nil {
+							log.Println("POP3:", "Error deleting message:", err)
+						}
+					}
 				}
 			}
 		}
@@ -64,7 +74,7 @@ checks:
 
 	count, _ := mailboxes.Stat(session.Username, false)
 
-	ex := sentences.EndGreeting()
+	ex := config.Configuration.POP3.EndGreeting
 	if session.Authenticated {
 		if ex != "" {
 			ex += " "

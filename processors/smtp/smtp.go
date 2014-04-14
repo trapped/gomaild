@@ -2,20 +2,10 @@ package smtp
 
 import (
 	. "github.com/trapped/gomaild/processors/smtp/client"
-	"github.com/trapped/gomaild/processors/smtp/cmdprocessor"
 	"log"
 	"net"
 	"os"
 	"strconv"
-	//SMTP commands
-	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/data"
-	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/ehlo"
-	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/helo"
-	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/mail"
-	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/noop"
-	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/quit"
-	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/rcpt"
-	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/rset"
 )
 
 type SMTP struct {
@@ -33,15 +23,6 @@ func (p *SMTP) Listen() {
 	if p.Port == 0 {
 		p.Port = 25
 	}
-	//Initialize SMTP commands
-	cmdprocessor.Commands["helo"] = helo.Process
-	cmdprocessor.Commands["ehlo"] = ehlo.Process
-	cmdprocessor.Commands["quit"] = quit.Process
-	cmdprocessor.Commands["mail"] = mail.Process
-	cmdprocessor.Commands["rcpt"] = rcpt.Process
-	cmdprocessor.Commands["data"] = data.Process
-	cmdprocessor.Commands["noop"] = noop.Process
-	cmdprocessor.Commands["rset"] = rset.Process
 
 	listener, err := net.Listen("tcp", "0.0.0.0:"+strconv.Itoa(p.Port))
 	if err != nil {

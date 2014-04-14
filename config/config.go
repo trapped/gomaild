@@ -22,11 +22,17 @@ type Settings struct {
 }
 
 type POP3sett struct {
-	StartGreeting string `json:"start_greeting"`
-	EndGreeting   string `json:"end_greeting"`
-	EnableUSER    bool   `json:"enable_user_cmd"`
-	SecureUSER    bool   `json:"secure_user_cmd"`
-	FakeDELE      bool   `json:"fake_dele_cmd"`
+	StartGreeting          string `json:"start_greeting"`
+	EndGreeting            string `json:"end_greeting"`
+	EnableUSER             bool   `json:"enable_user_cmd"`
+	SecureUSER             bool   `json:"secure_user_cmd"`
+	FakeDELE               bool   `json:"fake_dele_cmd"`
+	Timeout                uint   `json:"timeout"`
+	TimeoutMessage         string `json:"timeout_message"`
+	UserInvalidMessage     string `json:"user_invalid_message"`
+	UserOkMessage          string `json:"user_ok_message"`
+	PasswordInvalidMessage string `json:"password_invalid_message"`
+	PasswordOkMessage      string `json:"password_ok_message"`
 }
 
 type SMTPsett struct {

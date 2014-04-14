@@ -6,11 +6,29 @@ import (
 	. "github.com/trapped/gomaild/processors/smtp/reply"
 	. "github.com/trapped/gomaild/processors/smtp/session"
 	"strings"
+	//SMTP commands
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/data"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/ehlo"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/helo"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/mail"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/noop"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/quit"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/rcpt"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/rset"
 )
 
 var (
 	//Map containing commands and their relative function (to be executed when a command is issued)
-	Commands map[string]func(*Session, textual.Statement) Reply = make(map[string]func(*Session, textual.Statement) Reply, 0)
+	Commands map[string]func(*Session, textual.Statement) Reply = map[string]func(*Session, textual.Statement) Reply{
+		"data": data.Process,
+		"ehlo": ehlo.Process,
+		"helo": helo.Process,
+		"mail": mail.Process,
+		"noop": noop.Process,
+		"quit": quit.Process,
+		"rcpt": rcpt.Process,
+		"rset": rset.Process,
+	}
 )
 
 //Processor is a struct to provide a throw-away command processor and session for SMTP.

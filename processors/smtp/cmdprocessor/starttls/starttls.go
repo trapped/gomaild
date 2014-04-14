@@ -8,11 +8,15 @@ import (
 )
 
 func Process(session *Session, c Statement) Reply {
-	log.Println()
+	if !config.Configuration.SMTP.EnableSTARTTLS {
+		return Reply{Code: 502, Message: "command not available"}
+	}
 	if session.InTLS {
 		return Reply{Code: 454, Message: "already in TLS"}
 	}
-	session.State = NONE
-	session.Identity = ""
+
+	log.Println("SMTP:", "STARTTLS command issued by", session.RemoteEP)
+
+	session.InTLS = true
 	return Reply{Code: 220, Message: "ready to start TLS"}
 }

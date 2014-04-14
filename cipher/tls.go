@@ -1,15 +1,31 @@
 package cipher
 
 import (
-	"errors"
+	"crypto/tls"
 	"github.com/trapped/gomaild/config"
-	. "github.com/trapped/gomaild/parsers/textual"
-	"strings"
+	"log"
+	"net"
 )
 
-var TLS_CERT_FILE string
-var TLS_CERT_KEY_FILE string
-var TLS_CERT_SERVNAME string
+var TLSAvailable bool
+var TLSConfig *tls.Config
 
-func readconf() error {
+func TLSLoadCertificate() {
+	cert, err := tls.LoadX509KeyPair(config.Configuration.TLS.CertificateFile,
+		config.Configuration.TLS.CertificateKeyFile)
+	if err != nil {
+		log.Println("TLS:", "Failed loading SSL certificate:", err)
+		return
+	}
+	TLSAvailable = true
+	TLSConfig = &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		ClientAuth:   tls.VerifyClientCertIfGiven,
+	}
+}
+
+func TLSTransmuteConn(c net.Conn) net.Conn {
+	tc := tls.Server(c, TLSConfig)
+	tc.Handshake()
+	return net.Conn(tc)
 }

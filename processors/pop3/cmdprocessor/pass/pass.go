@@ -2,6 +2,7 @@ package pass
 
 import (
 	"errors"
+	"github.com/trapped/gomaild/config"
 	"github.com/trapped/gomaild/locker"
 	"github.com/trapped/gomaild/mailboxes"
 	. "github.com/trapped/gomaild/parsers/textual"
@@ -25,6 +26,10 @@ returnerror:
 	}
 
 checks:
+	if !config.Configuration.POP3.EnableUSER {
+		errorslice = append(errorslice, "command not available")
+		goto returnerror
+	}
 	if session.State != AUTHORIZATION {
 		errorslice = append(errorslice, "wrong session state")
 	}
@@ -52,12 +57,12 @@ checks:
 
 	password, exists := mailboxes.GetUser(session.Username)
 	if exists != nil {
-		errorslice = append(errorslice, "no such username/password combination")
+		errorslice = append(errorslice, config.Configuration.POP3.PasswordInvalidMessage)
 		goto returnerror
 	}
 
 	if password != c.Arguments[1] {
-		errorslice = append(errorslice, "no such username/password combination")
+		errorslice = append(errorslice, config.Configuration.POP3.PasswordInvalidMessage)
 		goto returnerror
 	}
 

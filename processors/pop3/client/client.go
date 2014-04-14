@@ -17,20 +17,22 @@ import (
 
 //Client is the structure used to store some useful parts of the POP3 clients.
 type Client struct {
-	Parent   *net.Listener //The client's parent listener.
-	Conn     net.Conn      //The client's network connection.
-	Start    time.Time     //The connection start time.
-	End      time.Time     //The connection end time.
-	KeepOpen bool          //Whether to keep Process() looping or not.
+	Parent       *net.Listener //The client's parent listener.
+	Conn         net.Conn      //The client's network connection.
+	Start        time.Time     //The connection start time.
+	End          time.Time     //The connection end time.
+	KeepOpen     bool          //Whether to keep Process() looping or not.
+	TimeoutTimer *time.Timer   //Timer to check whether the connection times out.
 }
 
 //MakeClient creates a client, given a parent network listener and a network connection.
 func MakeClient(parent *net.Listener, conn net.Conn) *Client {
 	return &Client{
-		Parent:   parent,
-		Conn:     conn,
-		Start:    time.Now(),
-		KeepOpen: true,
+		Parent:       parent,
+		Conn:         conn,
+		Start:        time.Now(),
+		KeepOpen:     true,
+		TimeoutTimer: time.NewTimer(time.Duration(config.Configuration.POP3.Timeout) * time.Second),
 	}
 }
 
@@ -75,6 +77,9 @@ func (c *Client) Process() {
 		return
 	}
 
+	//Start the goroutine to check for timeout
+	go c.Timeout()
+
 	//Stop looping if the KeepOpen property of the client becomes false.
 	for c.KeepOpen {
 		//Stop looping if the client quits its POP3 session.
@@ -90,6 +95,9 @@ func (c *Client) Process() {
 			log.Println(err2a)
 			break
 		}
+
+		//Reset the timeout timer
+		c.TimeoutTimer.Reset(time.Duration(config.Configuration.POP3.Timeout) * time.Second)
 
 		//Process the last command received from the client using cmdprocessor.Process() and send the result to the client.
 		err2b := c.Send(processor.Process(line))
@@ -110,4 +118,22 @@ func (c *Client) Process() {
 
 	//Log the connection ending, with the remote endpoint.
 	log.Println("POP3: Disconnecting", c.RemoteEP())
+}
+
+//Has to be started as a goroutine since it loops until timeout or connection end
+func (c *Client) Timeout() {
+	for c.KeepOpen {
+		select {
+		case x := <-c.TimeoutTimer.C:
+			log.Println("POP3:", "Timeout for", c.RemoteEP()+":", x)
+			c.End = time.Now()
+			c.Send("-ERR " + config.Configuration.POP3.TimeoutMessage)
+			c.KeepOpen = false
+			err := c.Conn.Close()
+			if err != nil {
+				log.Println("POP3:", "Error closing the connection for", c.RemoteEP()+":", err)
+			}
+			return
+		}
+	}
 }

@@ -53,13 +53,13 @@ checks:
 	if !config.Configuration.POP3.SecureUSER {
 		_, erra := mailboxes.GetUser(c.Arguments[1])
 		if erra != nil {
-			errorslice = append(errorslice, "no such user")
+			errorslice = append(errorslice, config.Configuration.POP3.UserInvalidMessage)
 			goto returnerror
 		}
 	}
 
 	session.Username = c.Arguments[1]
-	result += "user might exist"
+	result += config.Configuration.POP3.UserOkMessage
 
 	return result, nil
 }

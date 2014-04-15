@@ -15,19 +15,21 @@ import (
 	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/quit"
 	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/rcpt"
 	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/rset"
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/starttls"
 )
 
 var (
 	//Contains commands and their relative functions (to be executed when a command is issued)
 	Commands map[string]func(*Session, textual.Statement) Reply = map[string]func(*Session, textual.Statement) Reply{
-		"data": data.Process,
-		"ehlo": ehlo.Process,
-		"helo": helo.Process,
-		"mail": mail.Process,
-		"noop": noop.Process,
-		"quit": quit.Process,
-		"rcpt": rcpt.Process,
-		"rset": rset.Process,
+		"data":     data.Process,
+		"ehlo":     ehlo.Process,
+		"helo":     helo.Process,
+		"mail":     mail.Process,
+		"noop":     noop.Process,
+		"quit":     quit.Process,
+		"rcpt":     rcpt.Process,
+		"rset":     rset.Process,
+		"starttls": starttls.Process,
 	}
 )
 

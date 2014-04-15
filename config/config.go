@@ -51,6 +51,7 @@ type SMTPsett struct {
 	DATAStartMessage        string `json:"data_start_message"`        //Message to send after the client requests to send email data
 	Timeout                 uint   `json:"timeout"`                   //Time in seconds between commands before timeout
 	TimeoutMessage          string `json:"timeout_message"`           //Message to send on client timeout
+	EnableSTARTTLS          bool   `json:"enable_starttls"`           //Whether or not to enable the STARTTLS command
 }
 
 //Object storing TLS settings.

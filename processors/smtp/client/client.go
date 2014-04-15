@@ -95,9 +95,10 @@ func (c *Client) Process() {
 		c.TimeoutTimer.Reset(time.Duration(config.Configuration.SMTP.Timeout) * time.Second)
 
 		//Process the last command received from the client using cmdprocessor.Process() and send the result to the client. If the processor is waiting for a multiline message, just wait until it exits the COMPOSITION state.
-		oldsession := processor.Session
+		oldstate := processor.Session.State
+		oldtls := processor.Session.InTLS
 		result := processor.Process(line)
-		if processor.Session.State == COMPOSITION && oldsession.State == COMPOSITION {
+		if processor.Session.State == COMPOSITION && oldstate == COMPOSITION {
 			continue
 		}
 		err2b := c.Send(result)
@@ -106,9 +107,9 @@ func (c *Client) Process() {
 			log.Println(err2b)
 			break
 		}
-		if processor.Session.InTLS && !oldsession.InTLS {
-			processor.Session.InTLS = false
+		if processor.Session.InTLS && !oldtls {
 			c.Conn = cipher.TLSTransmuteConn(c.Conn)
+			bufin = bufio.NewReader(c.Conn)
 		}
 	}
 

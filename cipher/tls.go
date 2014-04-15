@@ -2,6 +2,7 @@
 package cipher
 
 import (
+	"crypto/rand"
 	"crypto/tls"
 	"github.com/trapped/gomaild/config"
 	"log"
@@ -23,12 +24,17 @@ func TLSLoadCertificate() {
 	TLSConfig = &tls.Config{
 		Certificates: []tls.Certificate{cert},
 		ClientAuth:   tls.VerifyClientCertIfGiven,
+		Rand:         rand.Reader,
 	}
 }
 
 //Converts a normal connection to a TLS-protected one, keeping the object type (net.Conn).
 func TLSTransmuteConn(c net.Conn) net.Conn {
 	tc := tls.Server(c, TLSConfig)
-	tc.Handshake()
-	return net.Conn(tc)
+	err := tc.Handshake()
+	if err != nil {
+		log.Println("TLS:", "Error handshaking for", c.RemoteAddr().String()+":", err)
+	}
+	log.Println("TLS:", "Handshaking successful for", c.RemoteAddr().String()+":", tc.ConnectionState().HandshakeComplete)
+	return tc
 }

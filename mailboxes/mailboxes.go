@@ -1,3 +1,4 @@
+//Package mailboxes provides static utility functions to manage mailboxes.
 package mailboxes
 
 import (
@@ -9,6 +10,7 @@ import (
 	"path/filepath"
 )
 
+//Checks the existence of a username; if it exists, returns its password, otherwise returns an error.
 func GetUser(s string) (string, error) {
 	log.Println("package/mailboxes:", "Queried existence of user <"+s+">")
 	if value, exists := config.Configuration.Accounts[s]; exists {
@@ -17,11 +19,13 @@ func GetUser(s string) (string, error) {
 	return "", errors.New("no such user")
 }
 
+//Blindly generates the mailbox filepath for a username. Check the existence of the username with GetUser first.
 func GetMailbox(user string) string {
 	log.Println("package/mailboxes:", "Queried blind path of mailbox for user <"+user+">")
 	return path.Dir(os.Args[0]) + "/mailboxes/" + user
 }
 
+//Blindly checks the number of files in a username's mailbox, their complessive size. It's possible to decide whether to include emails in the "deleted" folder.
 func Stat(user string, showdeleted bool) (int, int) {
 	log.Println("package/mailboxes:", "Queried stat[", showdeleted, "] of mailbox for user <"+user+">")
 	count, octets := 0, 0
@@ -44,6 +48,7 @@ func Stat(user string, showdeleted bool) (int, int) {
 	return count, octets
 }
 
+//Checks the existence of a username's mailbox, and, if it doesn't exist, creates it.
 func CreateIfNull(user string) {
 	log.Println("package/mailboxes:", "Checking existence of mailbox <"+user+">")
 	if _, err := os.Stat(GetMailbox(user)); err != nil {
@@ -57,6 +62,7 @@ func CreateIfNull(user string) {
 	}
 }
 
+//Creates a mailbox for the given username.
 func Create(user string) error {
 	log.Println("package/mailboxes:", "Creating mailbox for user <"+user+">")
 	err := os.Mkdir(GetMailbox(user), 0777)

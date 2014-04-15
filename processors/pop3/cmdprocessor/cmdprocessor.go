@@ -21,7 +21,7 @@ import (
 )
 
 var (
-	//Map containing commands and their relative function (to be executed when a command is issued)
+	//Contains commands and their relative functions (to be executed when a command is issued)
 	Commands map[string]func(*Session, textual.Statement) (string, error) = map[string]func(*Session, textual.Statement) (string, error){
 		"apop": apop.Process,
 		"capa": capa.Process,
@@ -38,12 +38,12 @@ var (
 	}
 )
 
-//Processor is a struct to provide a throw-away command processor and session for POP3.
+//Struct to provide a throw-away command processor and session for POP3.
 type Processor struct {
-	Session *Session
+	Session *Session //POP3 session, accessible by both the commands and the client handler
 }
 
-//Process processes a POP3 command and returns a result.
+//Processes a POP3 command and returns a result.
 func (p *Processor) Process(s string) string {
 	//Prepare a textual parser.
 	parser := textual.Parser{

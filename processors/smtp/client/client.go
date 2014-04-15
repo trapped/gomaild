@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-//Client is the structure used to store some useful parts of the SMTP clients.
+//Stores objects and data necessary to handle SMTP clients.
 type Client struct {
 	Parent       *net.Listener //The client's parent listener.
 	Conn         net.Conn      //The client's network connection.
@@ -23,7 +23,7 @@ type Client struct {
 	TimeoutTimer *time.Timer   //Timer to check whether the connection times out.
 }
 
-//MakeClient creates a client, given a parent network listener and a network connection.
+//Creates a Client ready to be used, given a parent network listener and a network connection.
 func MakeClient(parent *net.Listener, conn net.Conn) *Client {
 	return &Client{
 		Parent:       parent,
@@ -34,25 +34,23 @@ func MakeClient(parent *net.Listener, conn net.Conn) *Client {
 	}
 }
 
-//RemoteEP returns a string representing a client's connection remote endpoint, complete of IP address and port.
+//Returns a string representing a client's connection remote endpoint, complete of IP address and port.
 func (c *Client) RemoteEP() string {
 	return c.Conn.RemoteAddr().String()
 }
 
-//LocalEP returns a string representing a client's connection local endpoint, complete of IP address and port.
+//Returns a string representing a client's connection local endpoint, complete of IP address and port.
 func (c *Client) LocalEP() string {
 	return c.Conn.LocalAddr().String()
 }
 
-//Send sends a line of text, usually obtained from the execution of a SMTP command.
-//Send already appends the CRLF (0x0a 0x0d) termination octet pair.
+//Sends a line of text, usually obtained from the execution of a SMTP command. Already appends the CRLF (0x0a 0x0d) termination octet pair.
 func (c *Client) Send(s string) error {
 	_, err := c.Conn.Write([]byte(s + "\r\n"))
 	return err
 }
 
-//Process loops and processes the client's commands.
-//Process loops until: something changes its Client's KeepOpen property to false, the client QUITs the session, it encounters an error trying to read/write on the connection.
+//Loops and processes the client's commands, until something changes its Client's KeepOpen property to false, the client QUITs the session, or it encounters an error trying to read/write on the connection.
 func (c *Client) Process() {
 	//Close the network connection at the end of the function if it's not closed already.
 	defer c.Conn.Close()
@@ -126,7 +124,7 @@ func (c *Client) Process() {
 	log.Println("SMTP: Disconnecting", c.RemoteEP())
 }
 
-//Has to be started as a goroutine since it loops until timeout or connection end
+//Checks its client for SMTP timeout.
 func (c *Client) Timeout() {
 	for c.KeepOpen {
 		select {

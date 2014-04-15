@@ -1,3 +1,4 @@
+//Package textual provides parsing for telnet-like protocols.
 package textual
 
 import (
@@ -6,21 +7,24 @@ import (
 	"strings"
 )
 
+//A parser can be configured to remove a prefix, a suffix, heading and trailing whitespaces, split the text in arguments using separators, detect escaped characters by recognizing "brackets" (enclosures), and remove said brackets from the argument.
 type Parser struct {
-	Prefix             string
-	Suffix             string
-	OpenBrackets       bool
-	Brackets           []byte
-	ArgumentSeparators []byte
-	Trim               bool
+	Prefix             string //Prefix to remove
+	Suffix             string //Suffix to remove
+	OpenBrackets       bool   //Whether or not to open enclosures by removing the bracket characters
+	Brackets           []byte //The characters to treat as brackets
+	ArgumentSeparators []byte //The characters to treat as separators between arguments and therefore split the text by
+	Trim               bool   //Whether or not to remove heading and trailing whitespaces.
 }
 
+//The object storing the result of the parse operation.
 type Statement struct {
-	Raw       string
-	Name      string
-	Arguments []string
+	Raw       string   //The raw input string
+	Name      string   //The first argument (#0), which is usually the name of the command
+	Arguments []string //The full list of arguments
 }
 
+//Parses the input string and outputs a Statement.
 func (p *Parser) Parse(s string) Statement {
 	cmd := Statement{Raw: s}
 
@@ -81,6 +85,7 @@ func (p *Parser) Parse(s string) Statement {
 	return cmd
 }
 
+//Checks if a byte array contains a byte.
 func inarray(a []byte, b byte) bool {
 	for _, v := range a {
 		if b == v {

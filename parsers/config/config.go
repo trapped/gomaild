@@ -1,3 +1,4 @@
+//Package config provides parsing for particular JSON-structured text, enhanced to include comments.
 package config
 
 import (
@@ -5,6 +6,9 @@ import (
 	"strings"
 )
 
+//Parses a string, removes comments, and outputs it into the provided interface.
+//Comments can consist of entire lines or just start in the middle of one. Comments are delimited by the hash (#) character.
+//Comments can also be line blocks: "some code #a comment# some other code".
 func Parse(text string, object interface{}) error {
 	//Get original lines
 	lines := strings.Split(text, "\n")
@@ -14,7 +18,7 @@ func Parse(text string, object interface{}) error {
 	}
 	//Remove completely commented or empty lines
 	for i := 0; i < len(lines); i++ {
-        v := lines[i]
+		v := lines[i]
 		if strings.TrimSpace(v) == "" || v[0] == '#' {
 			lines = append(lines[:i], lines[i+1:]...)
 		}

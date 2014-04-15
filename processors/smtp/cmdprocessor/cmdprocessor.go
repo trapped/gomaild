@@ -18,7 +18,7 @@ import (
 )
 
 var (
-	//Map containing commands and their relative function (to be executed when a command is issued)
+	//Contains commands and their relative functions (to be executed when a command is issued)
 	Commands map[string]func(*Session, textual.Statement) Reply = map[string]func(*Session, textual.Statement) Reply{
 		"data": data.Process,
 		"ehlo": ehlo.Process,
@@ -31,13 +31,13 @@ var (
 	}
 )
 
-//Processor is a struct to provide a throw-away command processor and session for SMTP.
+//Struct to provide a throw-away command processor and session for SMTP.
 type Processor struct {
-	Session     *Session
-	LastCommand string
+	Session     *Session //SMTP session, accessible by both the commands and the client handler
+	LastCommand string   //The last successfully issued command
 }
 
-//Process processes a SMTP command and returns a result.
+//Processes a SMTP command and returns a result.
 func (p *Processor) Process(s string) string {
 	//Prepare a textual parser.
 	parser := textual.Parser{

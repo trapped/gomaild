@@ -66,7 +66,7 @@ func (c *Client) Process() {
 	}
 
 	//Set the POP3 session unique shared
-	processor.Session.Shared = "<" + strconv.Itoa(os.Getpid()) + "." + strconv.Itoa(time.Now().Nanosecond()) + ">"
+	processor.Session.Shared = "<" + strconv.Itoa(os.Getpid()) + "." + strconv.Itoa(time.Now().Nanosecond()) + "@" + config.Configuration.ServerName + ">"
 
 	//Send the POP3 session-start greeting eventually set in the "pop3.conf" configuration file.
 	err1 := c.Send("+OK " + config.Configuration.POP3.StartGreeting + " " + processor.Session.Shared)

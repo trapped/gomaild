@@ -5,6 +5,7 @@ import (
 	jconf "github.com/trapped/gomaild/parsers/config"
 	"io/ioutil"
 	"log"
+	"net"
 	"os"
 	"path"
 	"path/filepath"
@@ -15,12 +16,13 @@ var Configuration Settings //Object to use when accessing configuration
 
 //Root level configuration struct, storing global settings meant for the main package (the executable itself).
 type Settings struct {
-	Debug    bool              `json:"debug"`   //Whether or not to log debug information
-	Accounts map[string]string `json:"Accounts` //User accounts
-	Aliases  map[string]string `json:"Aliases"` //Email aliases
-	POP3     POP3sett          `json:"POP3"`    //POP3 settings object
-	SMTP     SMTPsett          `json:"SMTP"`    //SMTP settings object
-	TLS      TLSsett           `json:"TLS"`     //TLS settings object
+	Debug      bool              `json:"debug"`       //Whether or not to log debug information
+	ServerName string            `json:"server_name"` //The name of the server (e.g. mx.example.com or mail.example.com)
+	Accounts   map[string]string `json:"Accounts`     //User accounts
+	Aliases    map[string]string `json:"Aliases"`     //Email aliases
+	POP3       POP3sett          `json:"POP3"`        //POP3 settings object
+	SMTP       SMTPsett          `json:"SMTP"`        //SMTP settings object
+	TLS        TLSsett           `json:"TLS"`         //TLS settings object
 }
 
 //Object storing POP3 settings.
@@ -55,6 +57,7 @@ type SMTPsett struct {
 	EnableAUTH              bool   `json:"enable_auth"`               //Whether or not to enable the AUTH command
 	EnableAUTH_LOGIN        bool   `json:"enable_auth_login"`         //Whether or not to enable the LOGIN authentication type
 	EnableAUTH_PLAIN        bool   `json:"enable_auth_plain"`         //Whether or not to enable the PLAIN authentication type
+	EnableAUTH_CRAM_MD5     bool   `json:"enable_auth_cram_md5"`      //Whether or not to enable the CRAM-MD5 authentication type
 }
 
 //Object storing TLS settings.
@@ -76,6 +79,27 @@ func Read() {
 	for _, v := range confs {
 		ParseConfig(v)
 	}
+	//Get local server name if not set
+	if Configuration.ServerName != "" {
+		return
+	}
+	nets, err := net.InterfaceAddrs()
+SetErr:
+	if err != nil {
+		Configuration.ServerName = "gomaild"
+		log.Println("Configuration: Error trying to get the local server name, using 'gomaild'")
+		return
+	}
+	if len(nets) > 0 {
+		dom, err := net.LookupAddr(strings.Split(nets[0].String(), "/")[0])
+		if err != nil {
+			goto SetErr
+		}
+		if len(dom) > 0 {
+			Configuration.ServerName = dom[0]
+		}
+	}
+	log.Println("Configuration: Using", Configuration.ServerName, "as server name")
 }
 
 //Reads a file and parses its content into Configuration using the parsers/config package.

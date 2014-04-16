@@ -15,7 +15,7 @@ func Process(session *Session, c Statement) Reply {
 	log.Println("SMTP:", "RSET command issued by", session.RemoteEP, "with", session.Identity)
 
 	session.Received = []interface{}{}
-	session.Secret = ""
+	session.Shared = ""
 	session.State = NONE
 
 	return Reply{Code: 250, Message: "session has been reset"}

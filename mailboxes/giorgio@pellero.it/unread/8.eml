@@ -1,0 +1,12 @@
+Date: Thu, 17 Apr 2014 01:52:24 +0200
+To: giorgio@pellero.it
+From: test@pellero.it
+Subject: test Thu, 17 Apr 2014 01:52:24 +0200
+X-Mailer: swaks v20130209.0 jetmore.org/john/code/swaks/
+Received: from ([::1]:45284);
+        Thu, 17 Apr 2014 01:52:30 +0200
+Return-Path: <test@pellero.it>
+X-Recipients: <giorgio@pellero.it>
+
+This is a test mailing
+

@@ -34,6 +34,9 @@ func Process(session *Session, c Statement) Reply {
 		if config.Configuration.SMTP.EnableAUTH_PLAIN {
 			auths = append(auths, "PLAIN")
 		}
+		if config.Configuration.SMTP.EnableAUTH_CRAM_MD5 {
+			auths = append(auths, "CRAM-MD5")
+		}
 		if len(auths) != 0 {
 			capabilities += "250-AUTH " + strings.Join(auths, " ") + "\r\n"
 		}

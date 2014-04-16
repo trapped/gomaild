@@ -38,7 +38,7 @@ func Process(session *Session, c Statement) Reply {
 		return Login(session, c)
 		break
 	case "cram-md5":
-		//return CRAM_MD5(session, c)
+		return CRAM_MD5(session, c)
 		break
 	case "digest-md5":
 		//return Digest_MD5(session, c)

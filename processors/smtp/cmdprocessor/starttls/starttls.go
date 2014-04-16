@@ -31,5 +31,6 @@ func Process(session *Session, c Statement) Reply {
 	log.Println("SMTP:", "STARTTLS command issued by", session.RemoteEP)
 
 	session.InTLS = true
+	session.State = NONE //After issuing the STARTTLS command, clients EHLO/HELO again, since the server can disclose more information
 	return Reply{Code: 220, Message: "ready to start TLS"}
 }

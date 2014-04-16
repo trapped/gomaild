@@ -1,21 +1,31 @@
+//Package session provides structs to store session data.
 package session
 
-type S_State int
+var (
+	NONE         int = 0 //Just connected
+	IDENTIFIED   int = 1 //EHLO/HELO has been issued already
+	RECAPITATION int = 2 //MAIL has been issued with success
+	COMPOSITION  int = 3 //DATA has been issued with success and it's receiving data
+)
 
 var (
-	NONE          S_State = 0
-	IDENTIFICATED S_State = 1
-	AUTHENTICATED S_State = 2
-	RECAPITATION  S_State = 3
-	COMPOSITION   S_State = 4
+	AUTHNONE      int = 0
+	AUTHWUSER     int = 1 //AUTH Wait USERname
+	AUTHWPASS     int = 2 //AUTH Wait PASSword
+	AUTHENTICATED int = 3
 )
 
 type Session struct {
-	RemoteEP string
-	State    S_State
-	InTLS    bool
-	Identity string
-	Secret   string
-	Quitted  bool
-	Received []interface{}
+	RemoteEP      string //Stores the string representation of the remote endpoint
+	State         int    //Stores the session state
+	InTLS         bool   //Whether or not the connection is being encrypted with TLS
+	Authenticated bool   //Whether or not the client has authenticated
+	AuthState     int    //Stores the authentication process state
+	AuthMode      string //Stores the authentication process mode
+	Username      string //Stores the username of the eventually authenticated client
+	Password      string //Stores the password of the eventually authenticated client
+	Identity      string //Stores the identity provided by the client with EHLO/HELO
+	Secret        string
+	Quitted       bool          //Whether or not the client has QUIT'd the connection
+	Received      []interface{} //Stores the messages to recapitate
 }

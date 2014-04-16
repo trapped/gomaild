@@ -7,6 +7,7 @@ import (
 	. "github.com/trapped/gomaild/processors/smtp/session"
 	"strings"
 	//SMTP commands
+	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/auth"
 	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/data"
 	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/ehlo"
 	"github.com/trapped/gomaild/processors/smtp/cmdprocessor/helo"
@@ -21,6 +22,7 @@ import (
 var (
 	//Contains commands and their relative functions (to be executed when a command is issued)
 	Commands map[string]func(*Session, textual.Statement) Reply = map[string]func(*Session, textual.Statement) Reply{
+		"auth":     auth.Process,
 		"data":     data.Process,
 		"ehlo":     ehlo.Process,
 		"helo":     helo.Process,
@@ -54,7 +56,7 @@ func (p *Processor) Process(s string) string {
 	//Parse the command with the parser.
 	z := parser.Parse(s)
 
-	if p.Session.State == COMPOSITION {
+	if p.Session.State == COMPOSITION || p.Session.AuthState == AUTHWUSER || p.Session.AuthState == AUTHWPASS {
 		z.Name = p.LastCommand
 	}
 

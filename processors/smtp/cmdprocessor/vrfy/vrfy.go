@@ -10,7 +10,7 @@ import (
 )
 
 func Process(session *Session, c Statement) Reply {
-	if session.State != IDENTIFICATED {
+	if session.State != IDENTIFIED {
 		return Reply{Code: 503, Message: "wrong session state"}
 	}
 	if len(c.Arguments) < 2 {

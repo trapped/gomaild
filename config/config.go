@@ -52,6 +52,9 @@ type SMTPsett struct {
 	Timeout                 uint   `json:"timeout"`                   //Time in seconds between commands before timeout
 	TimeoutMessage          string `json:"timeout_message"`           //Message to send on client timeout
 	EnableSTARTTLS          bool   `json:"enable_starttls"`           //Whether or not to enable the STARTTLS command
+	EnableAUTH              bool   `json:"enable_auth"`               //Whether or not to enable the AUTH command
+	EnableAUTH_LOGIN        bool   `json:"enable_auth_login"`         //Whether or not to enable the LOGIN authentication type
+	EnableAUTH_PLAIN        bool   `json:"enable_auth_plain"`         //Whether or not to enable the PLAIN authentication type
 }
 
 //Object storing TLS settings.

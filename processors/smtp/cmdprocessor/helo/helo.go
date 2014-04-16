@@ -21,7 +21,7 @@ func Process(session *Session, c Statement) Reply {
 
 	greeting := "250 greetings, " + session.Identity
 
-	session.State = IDENTIFICATED
+	session.State = IDENTIFIED
 
 	return Reply{Message: greeting}
 }

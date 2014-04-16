@@ -25,7 +25,7 @@ func Process(session *Session, c Statement) Reply {
 	}
 
 	if c.Raw == ".\r\n" {
-		session.State = IDENTIFICATED
+		session.State = IDENTIFIED
 		return Reply{Code: 250, Message: config.Configuration.SMTP.QueuedMessage}
 	}
 

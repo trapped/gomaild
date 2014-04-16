@@ -32,7 +32,7 @@ func Process(session *Session, c Statement) Reply {
 
 	switch strings.ToLower(mode) {
 	case "plain":
-		//return Plain(session, c)
+		return Plain(session, c)
 		break
 	case "login":
 		return Login(session, c)

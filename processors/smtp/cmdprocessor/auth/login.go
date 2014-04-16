@@ -35,7 +35,6 @@ func Login(session *Session, c Statement) Reply {
 			session.Password = string(buf)
 
 			if config.Configuration.Accounts[session.Username] != session.Password {
-				session.State = IDENTIFIED
 				session.Username = ""
 				session.Password = ""
 				session.AuthState = AUTHNONE
@@ -45,7 +44,6 @@ func Login(session *Session, c Statement) Reply {
 			}
 
 			session.AuthState = AUTHENTICATED
-			session.State = IDENTIFIED
 			session.AuthMode = ""
 			log.Println("SMTP:", "AUTH LOGIN: Authentication successful for", session.RemoteEP)
 			return Reply{Code: 235, Message: "authentication successful"}

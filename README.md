@@ -45,6 +45,7 @@ gomaild is still in development: it's not recommended to deploy it in production
 
 - USER + PASS
 - APOP
+
 OAUTH/cookie-like authentication might get implemented.
 
 ####SMTP
@@ -62,6 +63,7 @@ OAUTH/cookie-like authentication might get implemented.
 - NOOP
 - RSET
 - VRFY
+
 Commands like TURN or ETRN might not get implemented (or, at least, not soon), since their use is very limited.
 
 #####Supported authentication methods
@@ -69,6 +71,7 @@ Commands like TURN or ETRN might not get implemented (or, at least, not soon), s
 - LOGIN
 - PLAIN
 - CRAM-MD5
+
 Due to the (apparent) lack of documentation about the DIGEST-MD5 method, I haven't implemented it yet.
 GSSAPI might not get implemented, since it's been standardized for the C language, not for the others: implementing it might cause conflicts with clients.
 OAUTH/cookie-like authentication might get implemented.
@@ -76,6 +79,7 @@ OAUTH/cookie-like authentication might get implemented.
 #####Supported encryption(cipher)
 
 - TLS
+
 At the moment, only through the STARTTLS command. Full-connection encryption will come soon.
 
 AES, RC4 (keys provided by the individual SMTP user) encryption is planned. TripleSec has been considered as well.

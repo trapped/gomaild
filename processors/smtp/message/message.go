@@ -48,7 +48,7 @@ func Store(session *Session, m Message) error {
 	}
 
 	//Add the "Received" header
-	recvfrom := fmt.Sprintf("from %s (EHLO %s) (%s)", remdom[0], session.Identity, session.RemoteEP, session.Username)
+	recvfrom := fmt.Sprintf("from %s (EHLO %s) (%s)", remdom[0], session.Identity, session.RemoteEP)
 	if session.Authenticated {
 		recvfrom += fmt.Sprintf("(AUTH %s %s)", strings.ToUpper(session.AuthMode), session.Username)
 	}

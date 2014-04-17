@@ -1,3 +1,4 @@
+//Implements the RCPT command.
 package rcpt
 
 import (
@@ -10,6 +11,7 @@ import (
 	"strings"
 )
 
+//Processes the RCPT command.
 func Process(session *Session, c Statement) Reply {
 	if session.State != RECAPITATION {
 		return Reply{Code: 503, Message: "wrong session state"}

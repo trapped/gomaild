@@ -1,3 +1,4 @@
+//Package message provides POP3 utility functions for MIME messages.
 package message
 
 import (
@@ -10,6 +11,7 @@ import (
 	"strings"
 )
 
+//Moves the message from a folder to another inside a user's mailbox.
 func MoveMessage(session *Session, m Message, destfolder string) error {
 	d := mailboxes.GetMailbox(session.Username) + "/" + destfolder + "/" + m.File.Name()
 	err := os.Rename(m.Path, d)
@@ -19,6 +21,7 @@ func MoveMessage(session *Session, m Message, destfolder string) error {
 	return nil
 }
 
+//Deletes permanently the message.
 func DeleteMessage(m Message) error {
 	err := os.Remove(m.Path)
 	if err != nil {
@@ -27,8 +30,10 @@ func DeleteMessage(m Message) error {
 	return nil
 }
 
+//Type necessary for sorting.
 type Messages []Message
 
+//A single message.
 type Message struct {
 	ID   int
 	File os.FileInfo
@@ -47,6 +52,7 @@ func (m Messages) Swap(i, j int) {
 	m[i], m[j] = m[j], m[i]
 }
 
+//Returns a sorted array of messages inside a user's mailbox.
 func Index(session *Session) []Message {
 	files := make([]Message, 0)
 	walkFn := func(p string, info os.FileInfo, e error) error {
@@ -73,6 +79,7 @@ func MessagesContain(i []interface{}, id int) bool {
 	return false
 }
 
+//Returns the headers of the message.
 func Headers(m Message) (string, error) {
 	file, err := ioutil.ReadFile(m.Path)
 	if err != nil {
@@ -90,6 +97,7 @@ func Headers(m Message) (string, error) {
 	return strings.Join(headers, "\r\n"), nil
 }
 
+//Returns the line number of the separator between the headers and the body of the message.
 func HeadersLimit(m Message) (int, error) {
 	file, err := ioutil.ReadFile(m.Path)
 	if err != nil {
@@ -104,6 +112,7 @@ func HeadersLimit(m Message) (int, error) {
 	return 0, nil
 }
 
+//Returns the body of the message.
 func Body(m Message) (string, error) {
 	file, err := ioutil.ReadFile(m.Path)
 	if err != nil {

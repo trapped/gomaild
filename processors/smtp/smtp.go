@@ -1,3 +1,4 @@
+//Package smtp implements the SMTP protocol.
 package smtp
 
 import (

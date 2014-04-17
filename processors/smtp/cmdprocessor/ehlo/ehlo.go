@@ -1,3 +1,4 @@
+//Implements the EHLO command.
 package ehlo
 
 import (
@@ -9,6 +10,7 @@ import (
 	"strings"
 )
 
+//Processes the EHLO command.
 func Process(session *Session, c Statement) Reply {
 	if session.State != NONE {
 		return Reply{Code: 503, Message: "wrong session state"}

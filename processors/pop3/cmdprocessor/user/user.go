@@ -1,3 +1,4 @@
+//Implements the USER command.
 package user
 
 import (
@@ -10,6 +11,7 @@ import (
 	"strings"
 )
 
+//Processes the USER command.
 func Process(session *Session, c Statement) (string, error) {
 	errorslice := []string{}
 	result := ""

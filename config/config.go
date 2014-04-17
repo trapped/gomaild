@@ -55,9 +55,9 @@ type SMTPsett struct {
 	TimeoutMessage          string `json:"timeout_message"`           //Message to send on client timeout
 	EnableSTARTTLS          bool   `json:"enable_starttls"`           //Whether or not to enable the STARTTLS command
 	EnableAUTH              bool   `json:"enable_auth"`               //Whether or not to enable the AUTH command
-	EnableAUTH_LOGIN        bool   `json:"enable_auth_login"`         //Whether or not to enable the LOGIN authentication type
-	EnableAUTH_PLAIN        bool   `json:"enable_auth_plain"`         //Whether or not to enable the PLAIN authentication type
-	EnableAUTH_CRAM_MD5     bool   `json:"enable_auth_cram_md5"`      //Whether or not to enable the CRAM-MD5 authentication type
+	EnableAUTH_LOGIN        bool   `json:"enable_auth_login"`         //Whether or not to enable the LOGIN authentication mode
+	EnableAUTH_PLAIN        bool   `json:"enable_auth_plain"`         //Whether or not to enable the PLAIN authentication mode
+	EnableAUTH_CRAM_MD5     bool   `json:"enable_auth_cram_md5"`      //Whether or not to enable the CRAM-MD5 authentication mode
 }
 
 //Object storing TLS settings.

@@ -1,0 +1,14 @@
+Date: Thu, 17 Apr 2014 15:52:01 +0200
+To: giorgio@pellero.it
+From: test@pellero.it
+Subject: test Thu, 17 Apr 2014 15:52:01 +0200
+X-Mailer: swaks v20130209.0 jetmore.org/john/code/swaks/
+Received: from localhost.localdomain (EHLO pellero.it) ([::1]:49002)
+        by localhost.localdomain using gomaild
+        for <giorgio@pellero.it>;
+        Thu, 17 Apr 2014 15:52:13 +0200
+Return-Path: <test@pellero.it>
+X-Recipients: <giorgio@pellero.it>
+
+This is a test mailing
+

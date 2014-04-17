@@ -1,3 +1,4 @@
+//Implements the LIST command.
 package list
 
 import (
@@ -11,6 +12,7 @@ import (
 	"strings"
 )
 
+//Processes the LIST command.
 func Process(session *Session, c Statement) (string, error) {
 	errorslice := []string{}
 	result := ""

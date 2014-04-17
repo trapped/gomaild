@@ -1,3 +1,4 @@
+//Implements the RSET command.
 package rset
 
 import (
@@ -7,6 +8,7 @@ import (
 	"log"
 )
 
+//Processes the RSET command.
 func Process(session *Session, c Statement) Reply {
 	if len(c.Arguments) != 1 {
 		return Reply{Code: 501, Message: "too many arguments"}

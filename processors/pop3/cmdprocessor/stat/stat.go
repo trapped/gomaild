@@ -1,3 +1,4 @@
+//Implements the STAT command.
 package stat
 
 import (
@@ -10,6 +11,7 @@ import (
 	"strings"
 )
 
+//Processes the STAT command.
 func Process(session *Session, c Statement) (string, error) {
 	errorslice := []string{}
 	result := ""

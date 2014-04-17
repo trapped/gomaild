@@ -1,3 +1,4 @@
+//Implements the VRFY command.
 package vrfy
 
 import (
@@ -9,6 +10,7 @@ import (
 	"regexp"
 )
 
+//Processes the VRFY command.
 func Process(session *Session, c Statement) Reply {
 	if session.State != IDENTIFIED {
 		return Reply{Code: 503, Message: "wrong session state"}

@@ -1,3 +1,4 @@
+//Package apop implements the APOP command.
 package apop
 
 import (
@@ -13,6 +14,7 @@ import (
 	"strings"
 )
 
+//Processes the APOP command.
 func Process(session *Session, c Statement) (string, error) {
 	errorslice := []string{}
 	result := ""

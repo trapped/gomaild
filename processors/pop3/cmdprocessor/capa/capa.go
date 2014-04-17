@@ -1,3 +1,4 @@
+//Implements the CAPA command.
 package capa
 
 import (
@@ -6,6 +7,7 @@ import (
 	"log"
 )
 
+//Processes the CAPA command.
 func Process(session *Session, c Statement) (string, error) {
 	log.Println("POP3:", "CAPA command issued by", session.RemoteEP, "with", session.Username)
 

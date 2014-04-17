@@ -1,3 +1,4 @@
+//Implements the DATA command.
 package data
 
 import (
@@ -9,6 +10,7 @@ import (
 	"log"
 )
 
+//Processes the DATA command.
 func Process(session *Session, c Statement) Reply {
 	if session.State != RECAPITATION && session.State != COMPOSITION {
 		return Reply{Code: 503, Message: "wrong session state"}

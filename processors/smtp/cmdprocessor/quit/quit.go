@@ -1,5 +1,7 @@
+//Implements the QUIT command.
 package quit
 
+//Processes the QUIT command.
 import (
 	"github.com/trapped/gomaild/config"
 	. "github.com/trapped/gomaild/parsers/textual"

@@ -1,3 +1,4 @@
+//Implements the NOOP command.
 package noop
 
 import (
@@ -7,6 +8,7 @@ import (
 	"log"
 )
 
+//Processes the NOOP command.
 func Process(session *Session, c Statement) Reply {
 	log.Println("SMTP:", "NOOP command issued by", session.RemoteEP, "with", session.Identity)
 	return Reply{Code: 250, Message: "no operation performed"}

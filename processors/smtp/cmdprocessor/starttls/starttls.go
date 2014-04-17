@@ -1,3 +1,4 @@
+//Implements the STARTTLS command.
 package starttls
 
 import (
@@ -9,6 +10,7 @@ import (
 	"log"
 )
 
+//Processes the STARTTLS command.
 func Process(session *Session, c Statement) Reply {
 	if !config.Configuration.SMTP.EnableSTARTTLS {
 		return Reply{Code: 502, Message: "command not available"}

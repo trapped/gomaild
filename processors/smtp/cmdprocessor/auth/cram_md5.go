@@ -16,6 +16,7 @@ import (
 	"time"
 )
 
+//Processes CRAM-MD5 authentication.
 func CRAM_MD5(session *Session, c Statement) Reply {
 	log.Println("SMTP:", "AUTH CRAM-MD5 (fragment) command issued by", session.RemoteEP)
 	session.AuthMode = "cram-md5"
@@ -30,16 +31,16 @@ func CRAM_MD5(session *Session, c Statement) Reply {
 			return Reply{Code: 451, Message: "failed to decode from base64"}
 		}
 
+		//Parse the client's response to the challenge
 		fields := strings.Split(string(buf), " ")
 		if len(fields) < 2 {
 			return Reply{Code: 501, Message: "wrong number of fields in the token"}
 		}
 
+		//Calculate the correct hash
 		part1 := hmac.New(md5.New, []byte(config.Configuration.Accounts[fields[0]]))
 		part1.Write([]byte(session.Shared))
 		part2 := hex.EncodeToString(part1.Sum(nil))
-
-		log.Println(fields[1], part2)
 
 		if part2 != fields[1] {
 			session.Username = ""
@@ -52,7 +53,6 @@ func CRAM_MD5(session *Session, c Statement) Reply {
 		session.Username = fields[0]
 		session.Password = config.Configuration.Accounts[fields[0]]
 		session.AuthState = AUTHENTICATED
-		session.AuthMode = ""
 		log.Println("SMTP:", "AUTH LOGIN: Authentication successful for", session.RemoteEP)
 		return Reply{Code: 235, Message: "authentication successful"}
 	}
@@ -61,7 +61,9 @@ func CRAM_MD5(session *Session, c Statement) Reply {
 		return Reply{Code: 501, Message: "wrong number of arguments"}
 	}
 
+	//Save the session state (waiting-for-input state and the shared that is sent to the client in the challenge)
 	session.Shared = shared
 	session.AuthState = AUTHWUSER
+	//Send the challenge
 	return Reply{Code: 334, Message: base64.StdEncoding.EncodeToString([]byte(shared))}
 }

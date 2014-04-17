@@ -1,3 +1,4 @@
+//Implements the PASS command.
 package pass
 
 import (
@@ -12,6 +13,7 @@ import (
 	"strings"
 )
 
+//Processes the PASS command.
 func Process(session *Session, c Statement) (string, error) {
 	errorslice := []string{}
 	result := ""

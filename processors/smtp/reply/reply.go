@@ -1,3 +1,4 @@
+//Provides a data structure for SMTP replies.
 package reply
 
 import "strconv"

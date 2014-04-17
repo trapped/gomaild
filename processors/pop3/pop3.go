@@ -1,3 +1,4 @@
+//Package pop3 implements the POP3 protocol.
 package pop3
 
 import (

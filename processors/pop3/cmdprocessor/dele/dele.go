@@ -1,3 +1,4 @@
+//Implements the DELE command.
 package dele
 
 import (
@@ -10,6 +11,7 @@ import (
 	"strings"
 )
 
+//Processes the DELE command.
 func Process(session *Session, c Statement) (string, error) {
 	errorslice := []string{}
 	result := ""

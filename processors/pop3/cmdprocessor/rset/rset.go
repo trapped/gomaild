@@ -1,3 +1,4 @@
+//Implements the RSET command.
 package rset
 
 import (
@@ -10,6 +11,7 @@ import (
 	"strings"
 )
 
+//Processes the RSET command.
 func Process(session *Session, c Statement) (string, error) {
 	errorslice := []string{}
 	result := ""

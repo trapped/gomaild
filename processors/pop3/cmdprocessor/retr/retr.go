@@ -1,3 +1,4 @@
+//Implements the RETR command.
 package retr
 
 import (
@@ -11,6 +12,7 @@ import (
 	"strings"
 )
 
+//Processes the RETR command.
 func Process(session *Session, c Statement) (string, error) {
 	errorslice := []string{}
 	result := ""

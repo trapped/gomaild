@@ -1,3 +1,4 @@
+//Implements the MAIL command.
 package mail
 
 import (
@@ -10,6 +11,7 @@ import (
 	"strings"
 )
 
+//Processes the MAIL command.
 func Process(session *Session, c Statement) Reply {
 	if session.State != IDENTIFIED {
 		return Reply{Code: 503, Message: "wrong session state"}

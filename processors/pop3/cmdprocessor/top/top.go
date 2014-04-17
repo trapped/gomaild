@@ -1,3 +1,4 @@
+//Implements the TOP command.
 package top
 
 import (
@@ -10,6 +11,7 @@ import (
 	"strings"
 )
 
+//Processes the TOP command.
 func Process(session *Session, c Statement) (string, error) {
 	errorslice := []string{}
 	result := ""

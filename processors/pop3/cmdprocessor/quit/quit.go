@@ -1,3 +1,4 @@
+//Implements the QUIT command.
 package quit
 
 import (
@@ -12,6 +13,7 @@ import (
 	"strings"
 )
 
+//Processes the QUIT command.
 func Process(session *Session, c Statement) (string, error) {
 	errorslice := []string{}
 	result := ""

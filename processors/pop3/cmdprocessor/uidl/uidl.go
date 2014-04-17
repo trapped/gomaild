@@ -1,3 +1,4 @@
+//Implements the UIDL command.
 package uidl
 
 import (
@@ -12,6 +13,7 @@ import (
 	"strings"
 )
 
+//Processes the UIDL command.
 func Process(session *Session, c Statement) (string, error) {
 	errorslice := []string{}
 	result := ""

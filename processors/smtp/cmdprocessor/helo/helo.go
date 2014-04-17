@@ -1,3 +1,4 @@
+//Implements the HELO command.
 package helo
 
 import (
@@ -7,6 +8,7 @@ import (
 	"log"
 )
 
+//Processes the HELO command.
 func Process(session *Session, c Statement) Reply {
 	if session.State != NONE {
 		return Reply{Code: 503, Message: "wrong session state"}

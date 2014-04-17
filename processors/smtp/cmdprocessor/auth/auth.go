@@ -1,3 +1,4 @@
+//Package auth implements SMTP authentication, such as PLAIN, LOGIN, and CRAM-MD5 SASL methods.
 package auth
 
 import (
@@ -8,6 +9,7 @@ import (
 	"strings"
 )
 
+//Processes authentication commands and data.
 func Process(session *Session, c Statement) Reply {
 	if !config.Configuration.SMTP.EnableAUTH {
 		return Reply{Code: 502, Message: "command not available"}
@@ -24,6 +26,7 @@ func Process(session *Session, c Statement) Reply {
 
 	mode := ""
 
+	//Check if the authentication process has already started and the received data has to be processed by the last used AuthMode
 	if len(c.Arguments) < 2 && session.AuthMode != "" {
 		mode = session.AuthMode
 	} else {
@@ -40,9 +43,9 @@ func Process(session *Session, c Statement) Reply {
 	case "cram-md5":
 		return CRAM_MD5(session, c)
 		break
-	case "digest-md5":
-		//return Digest_MD5(session, c)
-		break
+	/*case "digest-md5":
+	return Digest_MD5(session, c)
+	break*/
 	default:
 		return Reply{Code: 502, Message: "authentication method not implemented"}
 	}

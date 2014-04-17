@@ -5,10 +5,10 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 	"encoding/hex"
+	"errors"
 	"github.com/trapped/gomaild/config"
 	. "github.com/trapped/gomaild/parsers/textual"
-	. "github.com/trapped/gomaild/processors/smtp/reply"
-	. "github.com/trapped/gomaild/processors/smtp/session"
+	. "github.com/trapped/gomaild/processors/pop3/session"
 	"log"
 	"os"
 	"strconv"
@@ -17,24 +17,24 @@ import (
 )
 
 //Processes CRAM-MD5 authentication.
-func CRAM_MD5(session *Session, c Statement) Reply {
-	log.Println("SMTP:", "AUTH CRAM-MD5 (fragment) command issued by", session.RemoteEP)
+func CRAM_MD5(session *Session, c Statement) (string, error) {
+	log.Println("POP3:", "AUTH CRAM-MD5 (fragment) command issued by", session.RemoteEP)
 	session.AuthMode = "cram-md5"
 	shared := "<" + strconv.Itoa(os.Getpid()) + "." + strconv.Itoa(time.Now().Nanosecond()) + "@" + config.Configuration.ServerName + ">"
-	if !config.Configuration.SMTP.EnableAUTH_CRAM_MD5 {
-		return Reply{Code: 502, Message: "command not available"}
+	if !config.Configuration.POP3.EnableAUTH_CRAM_MD5 {
+		return "", errors.New("command not available")
 	}
 	if len(c.Arguments) == 1 && session.AuthState != AUTHNONE && session.AuthState == AUTHWUSER {
 		buf, err := base64.StdEncoding.DecodeString(c.Arguments[0])
 		if err != nil {
-			log.Println("SMTP:", "AUTH CRAM-MD5: Failed to decode from base64:", c.Arguments[0])
-			return Reply{Code: 451, Message: "failed to decode from base64"}
+			log.Println("POP3:", "AUTH CRAM-MD5: Failed to decode from base64:", c.Arguments[0])
+			return "", errors.New("failed to decode from base64")
 		}
 
 		//Parse the client's response to the challenge
 		fields := strings.Split(string(buf), " ")
 		if len(fields) < 2 {
-			return Reply{Code: 501, Message: "wrong number of fields in the token"}
+			return "", errors.New("wrong number of fields in the token")
 		}
 
 		//Calculate the correct hash
@@ -47,23 +47,25 @@ func CRAM_MD5(session *Session, c Statement) Reply {
 			session.Password = ""
 			session.AuthState = AUTHNONE
 			session.AuthMode = ""
-			return Reply{Code: 535, Message: "authentication failed"}
+			return "", errors.New("authentication failed")
 		}
 
 		session.Username = fields[0]
 		session.Password = config.Configuration.Accounts[fields[0]]
 		session.AuthState = AUTHENTICATED
-		log.Println("SMTP:", "AUTH LOGIN: Authentication successful for", session.RemoteEP)
-		return Reply{Code: 235, Message: "authentication successful"}
+		session.State = TRANSACTION
+		session.Authenticated = true
+		log.Println("POP3:", "AUTH LOGIN: Authentication successful for", session.RemoteEP)
+		return "authentication successful", nil
 	}
 
 	if len(c.Arguments) != 2 {
-		return Reply{Code: 501, Message: "wrong number of arguments"}
+		return "", errors.New("wrong number of arguments")
 	}
 
 	//Save the session state (waiting-for-input state and the shared that is sent to the client in the challenge)
 	session.Shared = shared
 	session.AuthState = AUTHWUSER
 	//Send the challenge
-	return Reply{Code: 334, Message: base64.StdEncoding.EncodeToString([]byte(shared))}
+	return base64.StdEncoding.EncodeToString([]byte(shared)), nil
 }

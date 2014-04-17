@@ -2,28 +2,28 @@ package auth
 
 import (
 	"encoding/base64"
+	"errors"
 	"github.com/trapped/gomaild/config"
 	. "github.com/trapped/gomaild/parsers/textual"
-	. "github.com/trapped/gomaild/processors/smtp/reply"
-	. "github.com/trapped/gomaild/processors/smtp/session"
+	. "github.com/trapped/gomaild/processors/pop3/session"
 	"log"
 	"strings"
 )
 
 //Processes PLAIN authentication.
-func Plain(session *Session, c Statement) Reply {
-	log.Println("SMTP:", "AUTH PLAIN (fragment) command issued by", session.RemoteEP)
+func Plain(session *Session, c Statement) (string, error) {
+	log.Println("POP3:", "AUTH PLAIN (fragment) command issued by", session.RemoteEP)
 	session.AuthMode = "plain"
-	if !config.Configuration.SMTP.EnableAUTH_PLAIN {
-		return Reply{Code: 502, Message: "command not available"}
+	if !config.Configuration.POP3.EnableAUTH_PLAIN {
+		return "", errors.New("command not available")
 	}
 	//If waiting for data
 	if len(c.Arguments) == 1 && session.AuthState != AUTHNONE && session.AuthState == AUTHWUSER {
 		//Decode the data received
 		buf, err := base64.StdEncoding.DecodeString(c.Arguments[2])
 		if err != nil {
-			log.Println("SMTP:", "AUTH PLAIN: Failed to decode from base64:", c.Arguments[0])
-			return Reply{Code: 451, Message: "failed to decode from base64"}
+			log.Println("POP3:", "AUTH PLAIN: Failed to decode from base64:", c.Arguments[0])
+			return "", errors.New("failed to decode from base64")
 		}
 
 		//Parse the data
@@ -39,7 +39,7 @@ func Plain(session *Session, c Statement) Reply {
 			session.Password = fields[2]
 			break
 		default:
-			return Reply{Code: 501, Message: "wrong number of fields in the token"}
+			return "", errors.New("wrong number of fields in the token")
 		}
 
 		//If the data doesn't match, reset the session
@@ -48,13 +48,15 @@ func Plain(session *Session, c Statement) Reply {
 			session.Password = ""
 			session.AuthState = AUTHNONE
 			session.AuthMode = ""
-			return Reply{Code: 535, Message: "authentication failed"}
+			return "", errors.New("authentication failed")
 		}
 
 		//Set the authentication state to "authenticated"
 		session.AuthState = AUTHENTICATED
-		log.Println("SMTP:", "AUTH LOGIN: Authentication successful for", session.RemoteEP)
-		return Reply{Code: 235, Message: "authentication successful"}
+		session.State = TRANSACTION
+		session.Authenticated = true
+		log.Println("POP3:", "AUTH LOGIN: Authentication successful for", session.RemoteEP)
+		return "authentication successful", nil
 	}
 
 	switch len(c.Arguments) {
@@ -62,14 +64,14 @@ func Plain(session *Session, c Statement) Reply {
 	case 2:
 		//Set authentication state to "waiting for data"
 		session.AuthState = AUTHWUSER
-		return Reply{Code: 334, Message: ""}
+		return "", nil
 	//If the client provided the PLAIN data already
 	case 3:
 		//Decode the data
 		buf, err := base64.StdEncoding.DecodeString(c.Arguments[2])
 		if err != nil {
-			log.Println("SMTP:", "AUTH PLAIN: Failed to decode from base64:", c.Arguments[2])
-			return Reply{Code: 451, Message: "failed to decode from base64"}
+			log.Println("POP3:", "AUTH PLAIN: Failed to decode from base64:", c.Arguments[2])
+			return "", errors.New("failed to decode from base64")
 		}
 
 		//Parse the data
@@ -85,7 +87,7 @@ func Plain(session *Session, c Statement) Reply {
 			session.Password = fields[2]
 			break
 		default:
-			return Reply{Code: 501, Message: "wrong number of fields in the token"}
+			return "", errors.New("wrong number of fields in the token")
 		}
 
 		//If the data doesn't match, reset the session
@@ -94,13 +96,15 @@ func Plain(session *Session, c Statement) Reply {
 			session.Password = ""
 			session.AuthState = AUTHNONE
 			session.AuthMode = ""
-			return Reply{Code: 535, Message: "authentication failed"}
+			return "", errors.New("authentication failed")
 		}
 
 		//Set the authentication state to "authenticated"
 		session.AuthState = AUTHENTICATED
-		log.Println("SMTP:", "AUTH LOGIN: Authentication successful for", session.RemoteEP)
-		return Reply{Code: 235, Message: "authentication successful"}
+		session.Authenticated = true
+		session.State = TRANSACTION
+		log.Println("POP3:", "AUTH LOGIN: Authentication successful for", session.RemoteEP)
+		return "authentication successful", nil
 	}
-	return Reply{Code: 451, Message: "processing error"}
+	return "", errors.New("processing error")
 }

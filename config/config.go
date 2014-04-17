@@ -38,6 +38,11 @@ type POP3sett struct {
 	UserOkMessage          string `json:"user_ok_message"`          //Message to send after a correct or "maybe" (see SecureUSER) USER command
 	PasswordInvalidMessage string `json:"password_invalid_message"` //Message to send after an incorrect PASS/APOP command
 	PasswordOkMessage      string `json:"password_ok_message"`      //Message to send after a correct PASS/APOP command
+	EnableSTLS             bool   `json:"enable_stls"`              //Whether or not to enable the STLS command
+	EnableAUTH             bool   `json:"enable_auth"`              //Whether or not to enable the AUTH command
+	EnableAUTH_LOGIN       bool   `json:"enable_auth_login"`        //Whether or not to enable the LOGIN authentication mode
+	EnableAUTH_PLAIN       bool   `json:"enable_auth_plain"`        //Whether or not to enable the PLAIN authentication mode
+	EnableAUTH_CRAM_MD5    bool   `json:"enable_auth_cram_md5"`     //Whether or not to enable the CRAM-MD5 authentication mode
 }
 
 //Object storing SMTP settings.

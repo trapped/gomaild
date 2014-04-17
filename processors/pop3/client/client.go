@@ -3,6 +3,7 @@ package client
 
 import (
 	"bufio"
+	"github.com/trapped/gomaild/cipher"
 	"github.com/trapped/gomaild/config"
 	"github.com/trapped/gomaild/locker"
 	"github.com/trapped/gomaild/mailboxes"
@@ -99,11 +100,16 @@ func (c *Client) Process() {
 		c.TimeoutTimer.Reset(time.Duration(config.Configuration.POP3.Timeout) * time.Second)
 
 		//Process the last command received from the client using cmdprocessor.Process() and send the result to the client.
+		oldtls := processor.Session.InTLS
 		err2b := c.Send(processor.Process(line))
 		//If an error occurs, log it and finalize the connection.
 		if err2b != nil {
 			log.Println(err2b)
 			break
+		}
+		if processor.Session.InTLS && !oldtls {
+			c.Conn = cipher.TLSTransmuteConn(c.Conn)
+			bufin = bufio.NewReader(c.Conn)
 		}
 	}
 

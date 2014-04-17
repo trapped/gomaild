@@ -3,7 +3,6 @@ package client
 
 import (
 	"bufio"
-	//"github.com/trapped/gomaild/locker"
 	"github.com/trapped/gomaild/cipher"
 	"github.com/trapped/gomaild/config"
 	"github.com/trapped/gomaild/processors/smtp/cmdprocessor"
@@ -61,9 +60,6 @@ func (c *Client) Process() {
 	processor := cmdprocessor.Processor{
 		Session: &Session{RemoteEP: c.RemoteEP()},
 	}
-
-	//Set the SMTP session unique shared
-	//processor.Session.Shared = "<" + strconv.Itoa(os.Getpid()) + "." + strconv.Itoa(time.Now().Nanosecond()) + ">"
 
 	//Send the SMTP session-start greeting eventually set in the "smtp.conf" configuration file and the shared.
 	err1 := c.Send("220 " + config.Configuration.SMTP.StartGreeting /* + " " + processor.Session.Shared*/)

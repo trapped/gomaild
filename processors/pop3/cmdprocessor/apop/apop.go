@@ -54,7 +54,9 @@ checks:
 
 	log.Println("POP3:", "APOP command issued by", session.RemoteEP, "with", c.Arguments[1])
 
-	password, exists := mailboxes.GetUser(c.Arguments[1])
+	session.Username = c.Arguments[1]
+
+	password, exists := mailboxes.GetUser(session.Username)
 	if exists != nil {
 		errorslice = append(errorslice, "no such user")
 		goto returnerror
@@ -71,7 +73,6 @@ checks:
 			goto returnerror
 		}
 
-		session.Username = c.Arguments[1]
 		session.Password = c.Arguments[1]
 		session.Authenticated = true
 		session.State = TRANSACTION

@@ -12,7 +12,7 @@ import (
 var TLSAvailable bool     //Whether TLS certificates have been loaded successfully
 var TLSConfig *tls.Config //Static configuration for TLS
 
-//Loads the TLS certificate provided in the configuration file. To be called at program start.
+//Loads the TLS certificate provided in the configuration file.
 func TLSLoadCertificate() {
 	cert, err := tls.LoadX509KeyPair(config.Configuration.TLS.CertificateFile,
 		config.Configuration.TLS.CertificateKeyFile)
@@ -35,6 +35,6 @@ func TLSTransmuteConn(c net.Conn) net.Conn {
 	if err != nil {
 		log.Println("TLS:", "Error handshaking for", c.RemoteAddr().String()+":", err)
 	}
-	log.Println("TLS:", "Handshaking successful for", c.RemoteAddr().String()+":", tc.ConnectionState().HandshakeComplete)
+	log.Println("TLS:", "Handshake completed for", c.RemoteAddr().String()+"; success:", tc.ConnectionState().HandshakeComplete)
 	return tc
 }

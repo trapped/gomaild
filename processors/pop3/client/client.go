@@ -84,6 +84,7 @@ func (c *Client) Process() {
 	for c.KeepOpen {
 		//Stop looping if the client quits its POP3 session.
 		if processor.Session.Quitted {
+			c.KeepOpen = false
 			break
 		}
 

@@ -64,10 +64,11 @@ func (p *Processor) Process(s string) string {
 	if _, exists := Commands[strings.ToLower(z.Name)]; exists {
 		p.LastCommand = z.Name
 		res := Commands[strings.ToLower(z.Name)](p.Session, z)
+		//Needed by the multiline EHLO response
 		if res.Code == 0 {
 			return res.Message
 		}
 		return res.String()
 	}
-	return "504 command not found"
+	return "504 command not implemented"
 }

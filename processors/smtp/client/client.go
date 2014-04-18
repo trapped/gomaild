@@ -75,6 +75,7 @@ func (c *Client) Process() {
 	for c.KeepOpen {
 		//Stop looping if the client quits its SMTP session.
 		if processor.Session.Quitted {
+			c.KeepOpen = false
 			break
 		}
 

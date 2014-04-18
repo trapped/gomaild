@@ -1,16 +1,22 @@
 all:
 	go get -u ./...
 	go build -a -v -race
-	go install
+
+all-norace:
+	go get -u ./...
+	go build -a -v
 
 install:
 	go install
 
-dep:
+deps:
 	go get -u ./...
 
 build:
 	go build -a -v -race
+
+build-norace:
+	go build -a -v
 
 clean:
 	go clean

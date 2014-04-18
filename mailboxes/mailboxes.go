@@ -29,22 +29,17 @@ func GetMailbox(user string) string {
 func Stat(user string, showdeleted bool) (int, int) {
 	log.Println("package/mailboxes:", "Queried stat[", showdeleted, "] of mailbox for user <"+user+">")
 	count, octets := 0, 0
-
 	walkFn := func(p string, info os.FileInfo, e error) error {
 		if e == nil && !info.IsDir() {
 			if path.Base(path.Dir(p)) == "deleted" && !showdeleted {
 				return nil
 			}
-
 			count++
 			octets += int(info.Size())
 		}
-
 		return nil
 	}
-
 	filepath.Walk(GetMailbox(user), walkFn)
-
 	return count, octets
 }
 
